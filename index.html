@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -8,6 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 <style>
+/* ═══ CSS CUSTOM PROPERTIES ═════════════════════════════════════════ */
 :root {
   --bg: #D0E1F7;
   --surface: #D0E1F7;
@@ -27,474 +28,856 @@
   --danger: #ef4444;
   --navy: #0a2647;
   --rose: #c48b90;
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;min-height:100vh;overflow-x:hidden;}
-body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;}
-
-/* ─── SCROLLBAR ─────────────────────────────────────────── */
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-
-/* ─── SHELL ─────────────────────────────────────────────── */
-#appShell{display:flex;min-height:100vh;}
-
-/* ─── SIDEBAR ───────────────────────────────────────────── */
-#sidebar{
-  width:220px;min-width:220px;
-  background:var(--surface);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  position:sticky;top:0;height:100vh;overflow-y:auto;
-  transition:transform .3s ease;z-index:200;
-}
-.sidebar-logo{
-  padding:28px 24px 20px;
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:10px;
-}
-.sidebar-logo .logo-mark{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:26px;letter-spacing:6px;color:var(--accent);
-}
-.sidebar-logo .logo-sub{
-  font-family:'DM Mono',monospace;
-  font-size:9px;letter-spacing:2px;color:var(--muted);
-  display:block;margin-top:-2px;
-}
-.conn-dot{
-  display:flex;align-items:center;gap:6px;
-  padding:10px 24px;font-family:'DM Mono',monospace;
-  font-size:9px;color:var(--muted);letter-spacing:1px;
-  border-bottom:1px solid var(--border);
-}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--warning);animation:pulse 2s infinite;}
-.dot.connected{background:var(--success);}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-
-.nav-section-label{
-  padding:18px 24px 6px;
-  font-family:'DM Mono',monospace;
-  font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;
-}
-.nav-btn{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 24px;
-  background:transparent;border:none;
-  color:var(--text2);font-family:'DM Sans',sans-serif;
-  font-size:13px;font-weight:500;cursor:pointer;
-  width:100%;text-align:left;transition:all .15s;
-  position:relative;
-}
-.nav-btn i{width:16px;text-align:center;font-size:12px;}
-.nav-btn .badge{
-  margin-left:auto;background:var(--accent2);color:#fff;
-  font-size:9px;padding:2px 6px;border-radius:10px;
-  font-family:'DM Mono',monospace;
-}
-.nav-btn:hover{color:var(--text);background:var(--surface2);}
-.nav-btn.active{color:var(--accent);background:rgba(201,245,59,.06);}
-.nav-btn.active::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;
-  width:2px;background:var(--accent);
+  --sidebar-w: 220px;
+  --header-h: 56px;
+  --page-pad: clamp(14px, 3vw, 36px);
 }
 
-.sidebar-footer{
-  margin-top:auto;padding:16px 24px;
-  border-top:1px solid var(--border);
+/* ═══ RESET ═════════════════════════════════════════════════════════ */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 14px; -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(13px, 1.5vw, 14px);
+  min-height: 100vh;
+  overflow-x: hidden;
 }
-.logout-btn{
-  width:100%;background:rgba(239,68,68,.08);
-  border:1px solid rgba(239,68,68,.2);
-  color:var(--danger);padding:8px 12px;
-  border-radius:4px;font-family:'DM Mono',monospace;
-  font-size:11px;letter-spacing:1px;cursor:pointer;
-  transition:all .2s;
-}
-.logout-btn:hover{background:rgba(239,68,68,.15);}
+img { max-width: 100%; display: block; }
+button { font-family: inherit; }
 
-/* ─── MOBILE HEADER ─────────────────────────────────────── */
-.mobile-header{
-  display:none;
-  background:var(--surface);border-bottom:1px solid var(--border);
-  padding:0 16px;height:56px;
-  align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:150;
-}
-.mobile-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:5px;color:var(--accent);}
-.menu-btn{
-  background:var(--surface2);border:1px solid var(--border);
-  color:var(--text2);width:36px;height:36px;
-  border-radius:4px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:14px;
-}
-.sidebar-backdrop{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.6);z-index:190;
+/* ═══ SCROLLBAR ═════════════════════════════════════════════════════ */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ═══ SHELL ═════════════════════════════════════════════════════════ */
+#appShell {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
 }
 
-/* ─── MAIN CONTENT ──────────────────────────────────────── */
-#mainContent{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+/* ═══ SIDEBAR ═══════════════════════════════════════════════════════ */
+#sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  transition: transform 0.3s ease, width 0.3s ease;
+  z-index: 200;
+  flex-shrink: 0;
+}
+.sidebar-logo {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.sidebar-logo .logo-mark {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: 6px;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.sidebar-logo .logo-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  display: block;
+  margin-top: -2px;
+  white-space: nowrap;
+}
+.conn-dot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 20px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.dot { width: 6px; height: 6px; border-radius: 50%; background: var(--warning); animation: pulse 2s infinite; flex-shrink: 0; }
+.dot.connected { background: var(--success); }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-/* ─── PAGE HEADER ───────────────────────────────────────── */
-.page-header{
-  padding:28px 36px 0;
-  border-bottom:1px solid var(--border);
-  background:var(--surface);
+.nav-section-label {
+  padding: 16px 20px 5px;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  flex-shrink: 0;
 }
-.page-header-inner{
-  display:flex;justify-content:space-between;align-items:flex-end;
-  padding-bottom:18px;gap:12px;flex-wrap:wrap;
+.nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  color: var(--text2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.15s;
+  position: relative;
+  white-space: nowrap;
+  overflow: hidden;
 }
-.page-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:4px;color:var(--text);}
-.page-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
-.header-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.nav-btn i { width: 16px; text-align: center; font-size: 12px; flex-shrink: 0; }
+.nav-btn .badge {
+  margin-left: auto;
+  background: var(--accent2);
+  color: #fff;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-family: 'DM Mono', monospace;
+  flex-shrink: 0;
+}
+.nav-btn:hover { color: var(--text); background: var(--surface2); }
+.nav-btn.active { color: var(--accent); background: rgba(201, 245, 59, 0.06); }
+.nav-btn.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--accent);
+}
+.sidebar-footer {
+  margin-top: auto;
+  padding: 14px 20px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.logout-btn {
+  width: 100%;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: var(--danger);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.logout-btn:hover { background: rgba(239, 68, 68, 0.18); }
 
-/* ─── PAGES ─────────────────────────────────────────────── */
-.page{display:none;padding:28px 36px;animation:fadeUp .3s ease;}
-.page.active{display:block;}
-@keyframes fadeUp{from{opacity:.3;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-/* ─── CARDS / PANELS ────────────────────────────────────── */
-.panel{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:6px;overflow:hidden;
+/* ═══ MOBILE HEADER ═════════════════════════════════════════════════ */
+.mobile-header {
+  display: none;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  height: var(--header-h);
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 150;
 }
-.panel-header{
-  padding:14px 20px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;gap:8px;
+.mobile-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 5px; color: var(--accent); }
+.menu-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  width: 36px; height: 36px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  flex-shrink: 0;
 }
-.panel-title{
-  font-family:'DM Mono',monospace;font-size:10px;
-  letter-spacing:2px;color:var(--text2);text-transform:uppercase;
-  display:flex;align-items:center;gap:8px;
-}
-.panel-title i{color:var(--accent);font-size:11px;}
-.panel-body{padding:20px;}
-
-/* ─── STAT CARDS ────────────────────────────────────────── */
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-.stat-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:6px;padding:20px;
-  transition:border-color .2s;
-}
-.stat-card:hover{border-color:var(--border2);}
-.stat-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
-.stat-value{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;line-height:1;}
-.stat-change{font-family:'DM Mono',monospace;font-size:10px;color:var(--success);margin-top:6px;}
-.stat-change.neg{color:var(--danger);}
-.stat-icon{
-  width:36px;height:36px;border-radius:4px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;margin-bottom:12px;
-}
-
-/* ─── BUTTONS ───────────────────────────────────────────── */
-.btn{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:8px 14px;border-radius:4px;border:none;
-  font-family:'DM Mono',monospace;font-size:11px;
-  letter-spacing:1px;cursor:pointer;transition:all .15s;
-  text-transform:uppercase;white-space:nowrap;
-}
-.btn-accent{background:var(--accent);color:#000;}
-.btn-accent:hover{opacity:.9;}
-.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--text2);}
-.btn-ghost:hover{border-color:var(--text2);color:var(--text);}
-.btn-danger{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:var(--danger);}
-.btn-danger:hover{background:rgba(239,68,68,.2);}
-.btn-blue{background:rgba(63,170,255,.1);border:1px solid rgba(63,170,255,.25);color:var(--accent3);}
-.btn-blue:hover{background:rgba(63,170,255,.2);}
-.btn-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:var(--success);}
-.btn-success:hover{background:rgba(34,197,94,.2);}
-.btn-sm{padding:5px 10px;font-size:10px;}
-
-/* ─── INPUTS ────────────────────────────────────────────── */
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
-.field{margin-bottom:14px;}
-label{
-  display:block;font-family:'DM Mono',monospace;
-  font-size:9px;letter-spacing:2px;color:var(--muted);
-  text-transform:uppercase;margin-bottom:6px;
-}
-input,select,textarea{
-  width:100%;background:var(--surface2);
-  border:1px solid var(--border2);color:var(--text);
-  padding:10px 12px;font-family:'DM Sans',sans-serif;
-  font-size:13px;outline:none;border-radius:4px;
-  transition:border-color .2s;
-}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);}
-input[type="number"]{font-family:'DM Mono',monospace;}
-textarea{resize:vertical;min-height:72px;}
-select option{background:var(--surface2);}
-
-/* ─── TABS ──────────────────────────────────────────────── */
-.tab-bar{display:flex;border-bottom:1px solid var(--border);margin-bottom:20px;}
-.tab-btn{
-  padding:10px 16px;background:transparent;border:none;
-  color:var(--muted);font-family:'DM Mono',monospace;
-  font-size:10px;letter-spacing:1px;cursor:pointer;
-  border-bottom:2px solid transparent;margin-bottom:-1px;
-  transition:all .15s;text-transform:uppercase;
-}
-.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
-.tab-btn:hover:not(.active){color:var(--text2);}
-
-/* ─── TABLE ─────────────────────────────────────────────── */
-.data-table{width:100%;border-collapse:collapse;}
-.data-table th{
-  font-family:'DM Mono',monospace;font-size:9px;
-  letter-spacing:2px;color:var(--muted);text-transform:uppercase;
-  padding:10px 12px;border-bottom:1px solid var(--border);
-  text-align:left;
-}
-.data-table td{
-  padding:12px 12px;border-bottom:1px solid rgba(255,255,255,.03);
-  font-size:13px;vertical-align:middle;
-}
-.data-table tr:hover td{background:rgba(255,255,255,.02);}
-.overflow-x{overflow-x:auto;}
-
-/* ─── PRODUCT CARDS GRID ────────────────────────────────── */
-.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
-.product-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:6px;overflow:hidden;
-  transition:border-color .2s,transform .2s;
-  animation:fadeUp .3s ease;
-}
-.product-card:hover{border-color:var(--border2);transform:translateY(-2px);}
-.product-card.sold-out{border-color:rgba(239,68,68,.3);opacity:.7;}
-.card-img{
-  width:100%;height:160px;object-fit:cover;
-  background:var(--surface2);display:block;
-}
-.card-img-placeholder{
-  width:100%;height:160px;background:var(--surface2);
-  display:flex;align-items:center;justify-content:center;
-  font-size:32px;color:var(--muted);
-}
-.card-body{padding:14px;}
-.card-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;margin-bottom:4px;}
-.card-meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
-.badge{
-  font-family:'DM Mono',monospace;font-size:9px;
-  padding:2px 7px;border-radius:2px;letter-spacing:1px;
-  text-transform:uppercase;
-}
-.badge-active{background:rgba(34,197,94,.1);color:var(--success);border:1px solid rgba(34,197,94,.2);}
-.badge-soldout{background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.2);}
-.badge-featured{background:rgba(212,175,55,.12);color:var(--gold);border:1px solid rgba(212,175,55,.2);}
-.badge-men{background:rgba(63,170,255,.1);color:var(--accent3);border:1px solid rgba(63,170,255,.2);}
-.badge-women{background:rgba(196,139,144,.12);color:var(--rose);border:1px solid rgba(196,139,144,.2);}
-.badge-watches{background:rgba(201,245,59,.08);color:var(--accent);border:1px solid rgba(201,245,59,.15);}
-.badge-sunglasses{background:rgba(245,158,11,.1);color:var(--warning);border:1px solid rgba(245,158,11,.2);}
-.badge-accessories{background:rgba(139,92,246,.1);color:#a78bfa;border:1px solid rgba(139,92,246,.2);}
-.card-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
-.c-stat{background:var(--surface2);border-radius:4px;padding:8px 10px;}
-.c-stat-label{font-family:'DM Mono',monospace;font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:3px;}
-.c-stat-value{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;}
-.price-val{color:var(--accent);}
-.qty-ok{color:var(--success);}
-.qty-low{color:var(--warning);}
-.qty-zero{color:var(--danger);}
-.card-actions{display:flex;gap:6px;}
-.sold-out-bar{background:var(--danger);color:#fff;text-align:center;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:4px;padding:6px;}
-
-/* ─── INVENTORY BARS ────────────────────────────────────── */
-.inv-progress{width:100%;height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-top:8px;}
-.inv-fill{height:100%;border-radius:3px;transition:width .3s;}
-.fill-high{background:var(--success);}
-.fill-med{background:var(--warning);}
-.fill-low{background:var(--danger);}
-
-/* ─── ORDERS ────────────────────────────────────────────── */
-.order-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:6px;padding:20px;margin-bottom:14px;
-  border-left:3px solid transparent;transition:all .2s;
-}
-.order-card.pending{border-left-color:var(--warning);}
-.order-card.processing{border-left-color:var(--accent3);}
-.order-card.completed{border-left-color:var(--success);}
-
-/* ─── MESSAGES ──────────────────────────────────────────── */
-.msg-card{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:6px;padding:18px;margin-bottom:12px;
-  border-left:3px solid transparent;transition:all .2s;
-}
-.msg-card.unread{border-left-color:var(--accent);}
-.msg-card.read{border-left-color:var(--muted);}
-
-/* ─── MODAL ─────────────────────────────────────────────── */
-.modal-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.75);backdrop-filter:blur(4px);
-  z-index:500;align-items:center;justify-content:center;padding:20px;
-}
-.modal-overlay.open{display:flex;}
-.modal{
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:8px;width:100%;max-width:560px;
-  max-height:90vh;overflow-y:auto;
-  animation:fadeUp .25s ease;
-}
-.modal-header{
-  padding:18px 22px;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-}
-.modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;}
-.modal-close{
-  background:var(--surface2);border:1px solid var(--border2);
-  color:var(--text2);width:30px;height:30px;
-  border-radius:4px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:12px;transition:all .2s;
-}
-.modal-close:hover{color:var(--danger);border-color:var(--danger);}
-.modal-body{padding:22px;}
-.modal-footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
-
-/* ─── TOAST ─────────────────────────────────────────────── */
-#toastContainer{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:8px;}
-.toast{
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:6px;padding:12px 16px;
-  display:flex;align-items:center;gap:10px;
-  font-family:'DM Mono',monospace;font-size:11px;
-  animation:toastIn .3s ease;min-width:260px;max-width:340px;
-  box-shadow:0 8px 24px rgba(0,0,0,.4);
-}
-.toast.success{border-left:3px solid var(--success);}
-.toast.error{border-left:3px solid var(--danger);}
-.toast.warning{border-left:3px solid var(--warning);}
-.toast.info{border-left:3px solid var(--accent3);}
-@keyframes toastIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
-
-/* ─── CHARTS ────────────────────────────────────────────── */
-.chart-wrap{position:relative;height:200px;}
-.chart-wrap-lg{position:relative;height:260px;}
-
-/* ─── FORECASTS ─────────────────────────────────────────── */
-.forecast-table{width:100%;border-collapse:collapse;}
-.forecast-table th{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;color:var(--muted);padding:8px;border-bottom:1px solid var(--border);text-align:left;}
-.forecast-table td{padding:10px 8px;border-bottom:1px solid rgba(255,255,255,.03);font-size:12px;}
-.rec-urgent{background:rgba(239,68,68,.12);color:var(--danger);padding:2px 8px;border-radius:2px;font-size:10px;}
-.rec-restock{background:rgba(245,158,11,.12);color:var(--warning);padding:2px 8px;border-radius:2px;font-size:10px;}
-.rec-stable{background:rgba(34,197,94,.1);color:var(--success);padding:2px 8px;border-radius:2px;font-size:10px;}
-.rec-high{background:rgba(201,245,59,.08);color:var(--accent);padding:2px 8px;border-radius:2px;font-size:10px;}
-
-/* ─── LOGIN ─────────────────────────────────────────────── */
-#loginGate{
-  display:none;position:fixed;inset:0;
-  background:var(--bg);z-index:9999;
-  align-items:center;justify-content:center;
-}
-.login-card{
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:8px;padding:36px;width:360px;
-}
-.login-logo{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:8px;color:var(--accent);margin-bottom:4px;}
-.login-sub{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:24px;}
-.login-btn{
-  width:100%;background:var(--accent);color:#000;border:none;
-  padding:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;
-  letter-spacing:3px;cursor:pointer;border-radius:4px;
-  transition:opacity .2s;margin-top:6px;
-}
-.login-btn:hover{opacity:.9;}
-.login-error{color:var(--danger);font-family:'DM Mono',monospace;font-size:11px;margin-bottom:10px;display:none;}
-
-/* ─── CHATBOT ───────────────────────────────────────────── */
-#chatBtn{
-  position:fixed;bottom:24px;right:24px;
-  width:52px;height:52px;background:var(--accent);
-  border-radius:50%;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;z-index:400;font-size:20px;color:#000;
-  box-shadow:0 4px 20px rgba(201,245,59,.3);transition:transform .2s;
-}
-#chatBtn:hover{transform:scale(1.05);}
-#chatPanel{
-  position:fixed;bottom:88px;right:24px;
-  width:340px;height:460px;
-  background:var(--surface);border:1px solid var(--border2);
-  border-radius:8px;display:none;flex-direction:column;
-  z-index:400;overflow:hidden;
-  animation:fadeUp .25s ease;
-}
-.chat-header{
-  padding:14px 18px;background:var(--surface2);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;
-}
-.chat-header-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:var(--accent);}
-.chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px;}
-.chat-msg{max-width:85%;padding:10px 12px;border-radius:6px;font-size:12px;line-height:1.5;}
-.chat-msg.user{background:var(--accent);color:#000;align-self:flex-end;font-weight:500;}
-.chat-msg.bot{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
-.chat-input-row{
-  display:flex;border-top:1px solid var(--border);
-}
-.chat-input-row input{
-  flex:1;background:transparent;border:none;
-  padding:12px 14px;color:var(--text);font-size:13px;outline:none;
-  border-radius:0;
-}
-.chat-send{
-  background:var(--accent);color:#000;border:none;
-  width:44px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;font-size:14px;
+.sidebar-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 190;
 }
 
-/* ─── RESPONSIVE ────────────────────────────────────────── */
-@media(max-width:1024px){
-  .stat-grid{grid-template-columns:repeat(2,1fr);}
-}
-@media(max-width:768px){
-  #sidebar{position:fixed;left:0;top:0;height:100%;transform:translateX(-100%);}
-  #sidebar.open{transform:translateX(0);}
-  .sidebar-backdrop.open{display:block;}
-  .mobile-header{display:flex;}
-  #mainContent{padding-top:0;}
-  .page{padding:18px;}
-  .page-header{padding:14px 18px 0;}
-  .stat-grid{grid-template-columns:1fr 1fr;}
-  .product-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
-  .form-row{grid-template-columns:1fr;}
-  #chatPanel{right:8px;width:calc(100% - 16px);}
-  #chatBtn{bottom:16px;right:16px;}
-}
-@media(max-width:480px){
-  .stat-grid{grid-template-columns:1fr;}
+/* ═══ MAIN CONTENT ══════════════════════════════════════════════════ */
+#mainContent {
+  flex: 1;
+  min-width: 0; /* prevent flex child overflow */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-/* ─── MISC ──────────────────────────────────────────────── */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
-.mt-4{margin-top:16px;} .mt-6{margin-top:24px;} .mb-4{margin-bottom:16px;}
-.flex{display:flex;} .items-center{align-items:center;} .gap-8{gap:8px;} .gap-12{gap:12px;}
-.justify-between{justify-content:space-between;}
-.text-muted{color:var(--muted);font-size:12px;}
-.text-accent{color:var(--accent);}
-.text-danger{color:var(--danger);}
-.text-success{color:var(--success);}
-.text-mono{font-family:'DM Mono',monospace;}
-.hidden{display:none!important;}
-.w-full{width:100%;}
-.divider{border:none;border-top:1px solid var(--border);margin:20px 0;}
-.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
-.empty-state i{font-size:36px;margin-bottom:12px;display:block;opacity:.3;}
-.empty-state p{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:1px;}
-.spinner-border{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .6s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
+/* ═══ PAGE HEADER ═══════════════════════════════════════════════════ */
+.page-header {
+  padding: var(--page-pad) var(--page-pad) 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  flex-shrink: 0;
+}
+.page-header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.page-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(20px, 3vw, 26px);
+  letter-spacing: 4px;
+  color: var(--text);
+}
+.page-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+.header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* ═══ PAGES ═════════════════════════════════════════════════════════ */
+.page { display: none; padding: var(--page-pad); animation: fadeUp 0.3s ease; flex: 1; }
+.page.active { display: block; }
+@keyframes fadeUp { from { opacity: 0.3; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ═══ PANELS ════════════════════════════════════════════════════════ */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.panel-header {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.panel-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--text2);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-title i { color: var(--accent); font-size: 11px; }
+.panel-body { padding: clamp(14px, 2vw, 20px); }
+
+/* ═══ STAT CARDS ════════════════════════════════════════════════════ */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(10px, 2vw, 16px);
+  margin-bottom: clamp(16px, 3vw, 24px);
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: clamp(14px, 2vw, 20px);
+  transition: border-color 0.2s;
+  min-width: 0;
+}
+.stat-card:hover { border-color: var(--border2); }
+.stat-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.stat-value {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(22px, 4vw, 32px);
+  letter-spacing: 1px;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stat-change { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--success); margin-top: 6px; }
+.stat-change.neg { color: var(--danger); }
+.stat-icon {
+  width: 34px; height: 34px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+/* ═══ BUTTONS ═══════════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: 4px;
+  border: none;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.btn-accent { background: var(--accent); color: #000; }
+.btn-accent:hover { opacity: 0.88; }
+.btn-ghost { background: transparent; border: 1px solid var(--border2); color: var(--text2); }
+.btn-ghost:hover { border-color: var(--text2); color: var(--text); }
+.btn-danger { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.25); color: var(--danger); }
+.btn-danger:hover { background: rgba(239,68,68,.2); }
+.btn-blue { background: rgba(63,170,255,.1); border: 1px solid rgba(63,170,255,.25); color: var(--accent3); }
+.btn-blue:hover { background: rgba(63,170,255,.2); }
+.btn-success { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.25); color: var(--success); }
+.btn-success:hover { background: rgba(34,197,94,.2); }
+.btn-sm { padding: 5px 10px; font-size: 10px; }
+
+/* ═══ INPUTS ════════════════════════════════════════════════════════ */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.field { margin-bottom: 14px; }
+label {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+input, select, textarea {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  padding: 9px 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  border-radius: 4px;
+  transition: border-color 0.2s;
+  min-width: 0;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+input[type="number"] { font-family: 'DM Mono', monospace; }
+textarea { resize: vertical; min-height: 68px; }
+select option { background: var(--surface2); }
+
+/* ═══ TABS ══════════════════════════════════════════════════════════ */
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 0;
+}
+.tab-btn {
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn:hover:not(.active) { color: var(--text2); }
+
+/* ═══ TABLE ═════════════════════════════════════════════════════════ */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+  text-transform: uppercase;
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+.data-table td { padding: 11px 10px; border-bottom: 1px solid rgba(255,255,255,.03); font-size: 12px; vertical-align: middle; }
+.data-table tr:hover td { background: rgba(255,255,255,.02); }
+.overflow-x { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* ═══ PRODUCT GRID ══════════════════════════════════════════════════ */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: clamp(10px, 2vw, 16px);
+}
+.product-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+  animation: fadeUp 0.3s ease;
+  min-width: 0;
+}
+.product-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.product-card.sold-out { border-color: rgba(239,68,68,.3); opacity: 0.7; }
+.card-img { width: 100%; height: clamp(120px, 15vw, 160px); object-fit: cover; background: var(--surface2); display: block; }
+.card-img-placeholder {
+  width: 100%;
+  height: clamp(120px, 15vw, 160px);
+  background: var(--surface2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: var(--muted);
+}
+.card-body { padding: clamp(10px, 2vw, 14px); }
+.card-name { font-family: 'Bebas Neue', sans-serif; font-size: clamp(15px, 2vw, 18px); letter-spacing: 1px; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-meta { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 9px; }
+.badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.badge-active { background: rgba(34,197,94,.1); color: var(--success); border: 1px solid rgba(34,197,94,.2); }
+.badge-soldout { background: rgba(239,68,68,.1); color: var(--danger); border: 1px solid rgba(239,68,68,.2); }
+.badge-featured { background: rgba(212,175,55,.12); color: var(--gold); border: 1px solid rgba(212,175,55,.2); }
+.badge-men { background: rgba(63,170,255,.1); color: var(--accent3); border: 1px solid rgba(63,170,255,.2); }
+.badge-women { background: rgba(196,139,144,.12); color: var(--rose); border: 1px solid rgba(196,139,144,.2); }
+.badge-watches { background: rgba(201,245,59,.08); color: var(--accent); border: 1px solid rgba(201,245,59,.15); }
+.badge-sunglasses { background: rgba(245,158,11,.1); color: var(--warning); border: 1px solid rgba(245,158,11,.2); }
+.badge-accessories { background: rgba(139,92,246,.1); color: #a78bfa; border: 1px solid rgba(139,92,246,.2); }
+.card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 11px; }
+.c-stat { background: var(--surface2); border-radius: 4px; padding: 7px 9px; }
+.c-stat-label { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; }
+.c-stat-value { font-family: 'DM Mono', monospace; font-size: clamp(13px, 2vw, 16px); font-weight: 500; }
+.price-val { color: var(--accent); }
+.qty-ok { color: var(--success); }
+.qty-low { color: var(--warning); }
+.qty-zero { color: var(--danger); }
+.card-actions { display: flex; gap: 6px; }
+.sold-out-bar { background: var(--danger); color: #fff; text-align: center; font-family: 'Bebas Neue', sans-serif; font-size: 12px; letter-spacing: 4px; padding: 6px; }
+
+/* ═══ INVENTORY BARS ════════════════════════════════════════════════ */
+.inv-progress { width: 100%; height: 5px; background: rgba(255,255,255,.06); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+.inv-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.fill-high { background: var(--success); }
+.fill-med { background: var(--warning); }
+.fill-low { background: var(--danger); }
+
+/* ═══ ORDER CARDS ═══════════════════════════════════════════════════ */
+.order-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: clamp(14px, 2vw, 20px);
+  margin-bottom: 12px;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+}
+.order-card.pending { border-left-color: var(--warning); }
+.order-card.processing { border-left-color: var(--accent3); }
+.order-card.completed { border-left-color: var(--success); }
+
+/* ═══ MESSAGE CARDS ═════════════════════════════════════════════════ */
+.msg-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: clamp(12px, 2vw, 18px);
+  margin-bottom: 10px;
+  border-left: 3px solid transparent;
+  transition: all 0.2s;
+}
+.msg-card.unread { border-left-color: var(--accent); }
+.msg-card.read { border-left-color: var(--muted); }
+
+/* ═══ MODAL ═════════════════════════════════════════════════════════ */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.78);
+  backdrop-filter: blur(4px);
+  z-index: 500;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  animation: fadeUp 0.25s ease;
+}
+.modal-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  z-index: 1;
+}
+.modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; }
+.modal-close {
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  width: 30px; height: 30px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.modal-close:hover { color: var(--danger); border-color: var(--danger); }
+.modal-body { padding: 20px; }
+.modal-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+}
+
+/* ═══ TOAST ═════════════════════════════════════════════════════════ */
+#toastContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: calc(100vw - 48px);
+}
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 6px;
+  padding: 11px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  animation: toastIn 0.3s ease;
+  min-width: 220px;
+  max-width: 320px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+}
+.toast.success { border-left: 3px solid var(--success); }
+.toast.error { border-left: 3px solid var(--danger); }
+.toast.warning { border-left: 3px solid var(--warning); }
+.toast.info { border-left: 3px solid var(--accent3); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+/* ═══ CHARTS ════════════════════════════════════════════════════════ */
+.chart-wrap { position: relative; height: clamp(140px, 20vw, 200px); }
+.chart-wrap-lg { position: relative; height: clamp(180px, 25vw, 260px); }
+
+/* ═══ FORECAST TABLE ════════════════════════════════════════════════ */
+.forecast-table { width: 100%; border-collapse: collapse; }
+.forecast-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--muted);
+  padding: 8px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+.forecast-table td { padding: 9px 8px; border-bottom: 1px solid rgba(255,255,255,.03); font-size: 12px; }
+.rec-urgent { background: rgba(239,68,68,.12); color: var(--danger); padding: 2px 7px; border-radius: 2px; font-size: 10px; white-space: nowrap; }
+.rec-restock { background: rgba(245,158,11,.12); color: var(--warning); padding: 2px 7px; border-radius: 2px; font-size: 10px; white-space: nowrap; }
+.rec-stable { background: rgba(34,197,94,.1); color: var(--success); padding: 2px 7px; border-radius: 2px; font-size: 10px; white-space: nowrap; }
+.rec-high { background: rgba(201,245,59,.08); color: var(--accent); padding: 2px 7px; border-radius: 2px; font-size: 10px; white-space: nowrap; }
+
+/* ═══ LOGIN ═════════════════════════════════════════════════════════ */
+#loginGate {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.login-card {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: clamp(24px, 5vw, 36px);
+  width: 100%;
+  max-width: 360px;
+}
+.login-logo { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 8px; color: var(--accent); margin-bottom: 4px; }
+.login-sub { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 2px; margin-bottom: 22px; }
+.login-btn {
+  width: 100%;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  padding: 12px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: opacity 0.2s;
+  margin-top: 6px;
+}
+.login-btn:hover { opacity: 0.88; }
+.login-error { color: var(--danger); font-family: 'DM Mono', monospace; font-size: 11px; margin-bottom: 10px; display: none; }
+
+/* ═══ CHATBOT ═══════════════════════════════════════════════════════ */
+#chatBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 50px; height: 50px;
+  background: var(--accent);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 400;
+  font-size: 20px;
+  color: #000;
+  box-shadow: 0 4px 20px rgba(201,245,59,.3);
+  transition: transform 0.2s;
+}
+#chatBtn:hover { transform: scale(1.06); }
+#chatPanel {
+  position: fixed;
+  bottom: 84px;
+  right: 24px;
+  width: min(340px, calc(100vw - 32px));
+  height: min(460px, calc(100vh - 120px));
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  display: none;
+  flex-direction: column;
+  z-index: 400;
+  overflow: hidden;
+  animation: fadeUp 0.25s ease;
+}
+.chat-header {
+  padding: 12px 16px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.chat-header-title { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; color: var(--accent); }
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.chat-msg {
+  max-width: 85%;
+  padding: 9px 11px;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.chat-msg.user { background: var(--accent); color: #000; align-self: flex-end; font-weight: 500; }
+.chat-msg.bot { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+.chat-quick { display: flex; gap: 5px; padding: 8px 10px; border-top: 1px solid var(--border); flex-wrap: wrap; flex-shrink: 0; }
+.chat-input-row { display: flex; border-top: 1px solid var(--border); flex-shrink: 0; }
+.chat-input-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 11px 13px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  border-radius: 0;
+  min-width: 0;
+}
+.chat-send {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  width: 42px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+/* ═══ LAYOUT HELPERS ════════════════════════════════════════════════ */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(14px, 2vw, 20px); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 2vw, 16px); }
+.mt-4 { margin-top: 16px; }
+.mt-6 { margin-top: 24px; }
+.mb-4 { margin-bottom: 16px; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.justify-between { justify-content: space-between; }
+.text-muted { color: var(--muted); font-size: 12px; }
+.text-accent { color: var(--accent); }
+.text-danger { color: var(--danger); }
+.text-success { color: var(--success); }
+.text-mono { font-family: 'DM Mono', monospace; }
+.hidden { display: none !important; }
+.w-full { width: 100%; }
+.divider { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+.empty-state { text-align: center; padding: 50px 20px; color: var(--muted); }
+.empty-state i { font-size: 32px; margin-bottom: 12px; display: block; opacity: 0.3; }
+.empty-state p { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 1px; }
+.spinner-border { display: inline-block; width: 13px; height: 13px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══ RESPONSIVE — 1200px ═══════════════════════════════════════════ */
+@media (max-width: 1200px) {
+  :root { --sidebar-w: 200px; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ═══ RESPONSIVE — 1024px ═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ═══ RESPONSIVE — 768px ════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  :root { --page-pad: 16px; }
+  #sidebar {
+    position: fixed;
+    left: 0; top: 0;
+    height: 100%;
+    transform: translateX(-100%);
+    z-index: 200;
+  }
+  #sidebar.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(0,0,0,.5); }
+  .sidebar-backdrop.open { display: block; }
+  .mobile-header { display: flex; }
+  .page { padding: 14px; }
+  .page-header { padding: 14px 14px 0; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .product-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+  .form-row { grid-template-columns: 1fr; }
+  #chatPanel { right: 8px; bottom: 76px; }
+  #chatBtn { bottom: 16px; right: 16px; }
+  #toastContainer { right: 12px; bottom: 16px; max-width: calc(100vw - 24px); }
+  .toast { max-width: calc(100vw - 24px); min-width: 0; }
+  .modal-overlay { padding: 10px; align-items: flex-end; }
+  .modal { max-height: 92vh; border-radius: 12px 12px 0 0; max-width: 100%; }
+}
+
+/* ═══ RESPONSIVE — 600px ════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .grid-3 { grid-template-columns: 1fr; }
+  .stat-value { font-size: 22px; }
+  .page-title { font-size: 20px; letter-spacing: 3px; }
+  .panel-body { padding: 12px; }
+  .header-actions { width: 100%; }
+  .header-actions .btn { flex: 1; justify-content: center; }
+}
+
+/* ═══ RESPONSIVE — 400px ════════════════════════════════════════════ */
+@media (max-width: 400px) {
+  :root { --page-pad: 12px; }
+  .stat-grid { grid-template-columns: 1fr; }
+  .card-stats { grid-template-columns: 1fr 1fr; }
+  .btn { padding: 6px 10px; font-size: 10px; }
+  .product-grid { grid-template-columns: 1fr 1fr; }
+  .modal-body { padding: 14px; }
+  .modal-footer { padding: 10px 14px; }
+}
+
+/* ═══ LARGE SCREENS — 1600px+ ════════════════════════════════════════ */
+@media (min-width: 1600px) {
+  :root { --sidebar-w: 240px; --page-pad: 40px; }
+  .stat-grid { grid-template-columns: repeat(4, 1fr); }
+  .product-grid { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+}
+
+/* ═══ SOCIAL POSTING CARDS — RESPONSIVE ════════════════════════════ */
+.social-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.social-card-left { display: flex; align-items: center; gap: 12px; flex-shrink: 1; min-width: 0; }
+.social-card-right { text-align: right; flex-shrink: 0; }
 </style>
 </head>
 <body>
 
-<!-- ═══ LOGIN GATE ═══════════════════════════════════════════ -->
+<!-- ═══ LOGIN GATE ════════════════════════════════════════════════ -->
 <div id="loginGate">
   <div class="login-card">
     <div class="login-logo">AURA</div>
@@ -508,10 +891,10 @@ select option{background:var(--surface2);}
   </div>
 </div>
 
-<!-- ═══ TOAST ═════════════════════════════════════════════════ -->
+<!-- ═══ TOAST ════════════════════════════════════════════════════ -->
 <div id="toastContainer"></div>
 
-<!-- ═══ APP SHELL ════════════════════════════════════════════ -->
+<!-- ═══ APP SHELL ═════════════════════════════════════════════════ -->
 <div id="appShell" style="display:none;">
 
   <!-- Mobile header -->
@@ -521,7 +904,7 @@ select option{background:var(--surface2);}
   </div>
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
-  <!-- ═══ SIDEBAR ══════════════════════════════════════════ -->
+  <!-- ═══ SIDEBAR ══════════════════════════════════════════════ -->
   <aside id="sidebar">
     <div class="sidebar-logo">
       <div>
@@ -571,10 +954,10 @@ select option{background:var(--surface2);}
     </div>
   </aside>
 
-  <!-- ═══ MAIN CONTENT ════════════════════════════════════ -->
+  <!-- ═══ MAIN CONTENT ═════════════════════════════════════════ -->
   <main id="mainContent">
 
-    <!-- ══ DASHBOARD ══════════════════════════════════════ -->
+    <!-- ══ DASHBOARD ════════════════════════════════════════ -->
     <div id="p-dashboard" class="page active">
       <div class="page-header">
         <div class="page-header-inner">
@@ -592,7 +975,7 @@ select option{background:var(--surface2);}
         </div>
       </div>
 
-      <div style="padding:24px 36px 36px;">
+      <div style="padding:var(--page-pad);">
         <!-- Stats -->
         <div class="stat-grid">
           <div class="stat-card">
@@ -610,7 +993,7 @@ select option{background:var(--surface2);}
           <div class="stat-card">
             <div class="stat-icon" style="background:rgba(196,139,144,.08)"><i class="fas fa-crown" style="color:var(--rose)"></i></div>
             <div class="stat-label">Top Product</div>
-            <div class="stat-value" style="font-size:18px;color:var(--rose)" id="st-top">—</div>
+            <div class="stat-value" style="font-size:clamp(14px,2vw,18px);color:var(--rose)" id="st-top">—</div>
             <div class="stat-change" id="st-top-rev" style="color:var(--rose)">—</div>
           </div>
           <div class="stat-card">
@@ -629,24 +1012,23 @@ select option{background:var(--surface2);}
           </div>
           <div class="panel-body">
             <div class="grid-3 mb-4">
-              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:16px;">
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:14px;">
                 <div class="stat-label" style="margin-bottom:8px">Next Month Sales</div>
-                <div class="stat-value" style="font-size:22px" id="nextMonthSales">—</div>
+                <div class="stat-value" style="font-size:clamp(18px,3vw,22px)" id="nextMonthSales">—</div>
                 <div class="stat-change" id="salesGrowth">—</div>
               </div>
-              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:16px;">
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:14px;">
                 <div class="stat-label" style="margin-bottom:8px">Inventory Forecast</div>
-                <div class="stat-value" style="font-size:22px" id="invForecast">—</div>
+                <div class="stat-value" style="font-size:clamp(18px,3vw,22px)" id="invForecast">—</div>
                 <div class="stat-change" style="color:var(--warning)" id="invChange">—</div>
               </div>
-              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:16px;">
+              <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:14px;">
                 <div class="stat-label" style="margin-bottom:8px">Forecast Confidence</div>
-                <div class="stat-value" style="font-size:22px">87%</div>
+                <div class="stat-value" style="font-size:clamp(18px,3vw,22px)">87%</div>
                 <div class="stat-change" style="color:#a78bfa">Based on recent trends</div>
               </div>
             </div>
-            <!-- Forecast table (live from Firebase) -->
-            <div class="overflow-x" style="margin-bottom:20px;">
+            <div class="overflow-x" style="margin-bottom:18px;">
               <table class="forecast-table">
                 <thead><tr>
                   <th>Product</th><th>Predicted Demand</th><th>Stock After</th><th>AI Recommendation</th>
@@ -654,7 +1036,6 @@ select option{background:var(--surface2);}
                 <tbody id="forecastBody"></tbody>
               </table>
             </div>
-            <!-- 30-day chart -->
             <div class="stat-label mb-4" style="margin-bottom:8px;">30-DAY SALES FORECAST</div>
             <div class="chart-wrap"><canvas id="forecastChart"></canvas></div>
           </div>
@@ -665,19 +1046,19 @@ select option{background:var(--surface2);}
           <div class="panel">
             <div class="panel-header"><div class="panel-title"><i class="fas fa-chart-pie"></i> CUSTOMER SENTIMENT</div></div>
             <div class="panel-body">
-              <div class="chart-wrap" style="height:160px;"><canvas id="sentimentChart"></canvas></div>
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0;text-align:center;">
-                <div><div id="posPercent" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--success)">72%</div><div class="text-muted">Positive</div></div>
-                <div><div id="neuPercent" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--muted)">18%</div><div class="text-muted">Neutral</div></div>
-                <div><div id="negPercent" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--danger)">10%</div><div class="text-muted">Negative</div></div>
+              <div class="chart-wrap" style="height:clamp(120px,15vw,160px);"><canvas id="sentimentChart"></canvas></div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0;text-align:center;">
+                <div><div id="posPercent" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,3vw,24px);color:var(--success)">72%</div><div class="text-muted">Positive</div></div>
+                <div><div id="neuPercent" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,3vw,24px);color:var(--muted)">18%</div><div class="text-muted">Neutral</div></div>
+                <div><div id="negPercent" style="font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,3vw,24px);color:var(--danger)">10%</div><div class="text-muted">Negative</div></div>
               </div>
-              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
-                <div style="background:var(--surface2);border-radius:4px;padding:12px;">
-                  <div class="stat-label" style="margin-bottom:8px;"><i class="fas fa-heart" style="color:var(--rose);margin-right:4px;"></i>Most Loved</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+                <div style="background:var(--surface2);border-radius:4px;padding:10px;">
+                  <div class="stat-label" style="margin-bottom:6px;"><i class="fas fa-heart" style="color:var(--rose);margin-right:4px;"></i>Most Loved</div>
                   <div id="mostLoved"></div>
                 </div>
-                <div style="background:var(--surface2);border-radius:4px;padding:12px;">
-                  <div class="stat-label" style="margin-bottom:8px;"><i class="fas fa-heart-crack" style="color:var(--muted);margin-right:4px;"></i>Most Hated</div>
+                <div style="background:var(--surface2);border-radius:4px;padding:10px;">
+                  <div class="stat-label" style="margin-bottom:6px;"><i class="fas fa-heart-crack" style="color:var(--muted);margin-right:4px;"></i>Most Hated</div>
                   <div id="mostHated"></div>
                 </div>
               </div>
@@ -686,27 +1067,27 @@ select option{background:var(--surface2);}
           <div class="panel">
             <div class="panel-header"><div class="panel-title"><i class="fas fa-clock"></i> BEST POSTING TIMES</div></div>
             <div class="panel-body">
-              <div style="display:flex;flex-direction:column;gap:10px;">
-                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:14px;display:flex;justify-content:space-between;align-items:center;">
-                  <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="width:36px;height:36px;border-radius:6px;background:linear-gradient(135deg,#f43f5e,#ec4899);display:flex;align-items:center;justify-content:center;"><i class="fab fa-instagram" style="color:#fff;"></i></div>
-                    <div><div style="font-size:13px;font-weight:500;">Instagram</div><div class="text-muted" style="font-size:11px;">Best: Lifestyle</div></div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div class="social-card">
+                  <div class="social-card-left">
+                    <div style="width:34px;height:34px;border-radius:6px;background:linear-gradient(135deg,#f43f5e,#ec4899);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fab fa-instagram" style="color:#fff;font-size:14px;"></i></div>
+                    <div style="min-width:0;"><div style="font-size:13px;font-weight:500;">Instagram</div><div class="text-muted" style="font-size:11px;">Best: Lifestyle</div></div>
                   </div>
-                  <div style="text-align:right;"><div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;">7–10 PM</div><div style="color:var(--success);font-size:10px;font-family:'DM Mono',monospace;">Luxury Active</div></div>
+                  <div class="social-card-right"><div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;">7–10 PM</div><div style="color:var(--success);font-size:10px;font-family:'DM Mono',monospace;">Luxury Active</div></div>
                 </div>
-                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:14px;display:flex;justify-content:space-between;align-items:center;">
-                  <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="width:36px;height:36px;border-radius:6px;background:#111;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;"><i class="fab fa-tiktok" style="color:#fff;"></i></div>
-                    <div><div style="font-size:13px;font-weight:500;">TikTok</div><div class="text-muted" style="font-size:11px;">Best: Unboxing</div></div>
+                <div class="social-card">
+                  <div class="social-card-left">
+                    <div style="width:34px;height:34px;border-radius:6px;background:#111;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fab fa-tiktok" style="color:#fff;font-size:14px;"></i></div>
+                    <div style="min-width:0;"><div style="font-size:13px;font-weight:500;">TikTok</div><div class="text-muted" style="font-size:11px;">Best: Unboxing</div></div>
                   </div>
-                  <div style="text-align:right;"><div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;">3–6 PM</div><div style="color:var(--success);font-size:10px;font-family:'DM Mono',monospace;">Virality</div></div>
+                  <div class="social-card-right"><div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;">3–6 PM</div><div style="color:var(--success);font-size:10px;font-family:'DM Mono',monospace;">Virality</div></div>
                 </div>
-                <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:14px;display:flex;justify-content:space-between;align-items:center;">
-                  <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="width:36px;height:36px;border-radius:6px;background:#facc15;display:flex;align-items:center;justify-content:center;"><i class="fab fa-snapchat" style="color:#000;"></i></div>
-                    <div><div style="font-size:13px;font-weight:500;">Snapchat</div><div class="text-muted" style="font-size:11px;">Best: BTS</div></div>
+                <div class="social-card">
+                  <div class="social-card-left">
+                    <div style="width:34px;height:34px;border-radius:6px;background:#facc15;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fab fa-snapchat" style="color:#000;font-size:14px;"></i></div>
+                    <div style="min-width:0;"><div style="font-size:13px;font-weight:500;">Snapchat</div><div class="text-muted" style="font-size:11px;">Best: BTS</div></div>
                   </div>
-                  <div style="text-align:right;"><div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;">9 PM–12 AM</div><div style="color:var(--success);font-size:10px;font-family:'DM Mono',monospace;">Young Luxury</div></div>
+                  <div class="social-card-right"><div style="font-family:'DM Mono',monospace;font-size:13px;font-weight:500;">9 PM–12</div><div style="color:var(--success);font-size:10px;font-family:'DM Mono',monospace;">Young Luxury</div></div>
                 </div>
               </div>
             </div>
@@ -715,12 +1096,12 @@ select option{background:var(--surface2);}
       </div>
     </div>
 
-    <!-- ══ RECOMMENDATIONS ════════════════════════════════ -->
+    <!-- ══ RECOMMENDATIONS ══════════════════════════════════ -->
     <div id="p-recommendations" class="page">
       <div class="page-header"><div class="page-header-inner">
         <div><div class="page-title">AI RECOMMENDATIONS</div><div class="page-sub">PERSONALIZED CONTENT STRATEGY</div></div>
       </div></div>
-      <div style="padding:24px 36px 36px;">
+      <div style="padding:var(--page-pad);">
         <div class="grid-2">
           <div class="panel"><div class="panel-header"><div class="panel-title"><i class="fas fa-robot"></i> AI CONTENT IDEAS</div></div>
             <div class="panel-body">
@@ -743,10 +1124,10 @@ select option{background:var(--surface2);}
           <div class="panel"><div class="panel-header"><div class="panel-title"><i class="fas fa-calendar"></i> RECOMMENDED SCHEDULE</div></div>
             <div class="panel-body">
               <div style="display:flex;flex-direction:column;gap:8px;">
-                <div style="display:flex;justify-content:space-between;background:var(--surface2);padding:10px 14px;border-radius:4px;"><span>Monday</span><span style="color:var(--accent);font-family:'DM Mono',monospace;">7:30 PM</span><span class="text-muted">Lifestyle</span></div>
-                <div style="display:flex;justify-content:space-between;background:var(--surface2);padding:10px 14px;border-radius:4px;"><span>Wednesday</span><span style="color:var(--accent);font-family:'DM Mono',monospace;">8:00 PM</span><span class="text-muted">Carousel</span></div>
-                <div style="display:flex;justify-content:space-between;background:var(--surface2);padding:10px 14px;border-radius:4px;"><span>Friday</span><span style="color:var(--accent);font-family:'DM Mono',monospace;">4:00 PM</span><span class="text-muted">Unboxing</span></div>
-                <div style="display:flex;justify-content:space-between;background:var(--surface2);padding:10px 14px;border-radius:4px;"><span>Sunday</span><span style="color:var(--accent);font-family:'DM Mono',monospace;">9:30 PM</span><span class="text-muted">BTS</span></div>
+                <div style="display:flex;justify-content:space-between;background:var(--surface2);padding:10px 14px;border-radius:4px;gap:8px;flex-wrap:wrap;"><span>Monday</span><span style="color:var(--accent);font-family:'DM Mono',monospace;">7:30 PM</span><span class="text-muted">Lifestyle</span></div>
+                <div style="display:flex;justify-content:space-between;background:var(--surface2);padding:10px 14px;border-radius:4px;gap:8px;flex-wrap:wrap;"><span>Wednesday</span><span style="color:var(--accent);font-family:'DM Mono',monospace;">8:00 PM</span><span class="text-muted">Carousel</span></div>
+                <div style="display:flex;justify-content:space-between;background:var(--surface2);padding:10px 14px;border-radius:4px;gap:8px;flex-wrap:wrap;"><span>Friday</span><span style="color:var(--accent);font-family:'DM Mono',monospace;">4:00 PM</span><span class="text-muted">Unboxing</span></div>
+                <div style="display:flex;justify-content:space-between;background:var(--surface2);padding:10px 14px;border-radius:4px;gap:8px;flex-wrap:wrap;"><span>Sunday</span><span style="color:var(--accent);font-family:'DM Mono',monospace;">9:30 PM</span><span class="text-muted">BTS</span></div>
               </div>
             </div>
           </div>
@@ -754,12 +1135,12 @@ select option{background:var(--surface2);}
       </div>
     </div>
 
-    <!-- ══ FINANCES ═══════════════════════════════════════ -->
+    <!-- ══ FINANCES ════════════════════════════════════════ -->
     <div id="p-finances" class="page">
       <div class="page-header"><div class="page-header-inner">
         <div><div class="page-title">FINANCIAL ANALYTICS</div><div class="page-sub">YEARLY PROFIT / LOSS ANALYSIS</div></div>
       </div></div>
-      <div style="padding:24px 36px 36px;">
+      <div style="padding:var(--page-pad);">
         <div class="grid-2">
           <div class="panel"><div class="panel-header"><div class="panel-title"><i class="fas fa-chart-pie"></i> YEARLY P/L</div></div>
             <div class="panel-body"><div class="chart-wrap-lg"><canvas id="yearlyChart"></canvas></div></div>
@@ -773,7 +1154,7 @@ select option{background:var(--surface2);}
       </div>
     </div>
 
-    <!-- ══ PRODUCTS ═══════════════════════════════════════ -->
+    <!-- ══ PRODUCTS ════════════════════════════════════════ -->
     <div id="p-products" class="page">
       <div class="page-header"><div class="page-header-inner">
         <div><div class="page-title">PRODUCTS</div><div class="page-sub">FIREBASE REALTIME DATABASE</div></div>
@@ -783,8 +1164,7 @@ select option{background:var(--surface2);}
         </div>
       </div></div>
 
-      <div style="padding:24px 36px 36px;">
-        <!-- Add Product panel -->
+      <div style="padding:var(--page-pad);">
         <div class="panel mb-4">
           <div class="panel-header"><div class="panel-title"><i class="fas fa-plus-circle"></i> ADD NEW PRODUCT</div></div>
           <div class="panel-body">
@@ -822,7 +1202,6 @@ select option{background:var(--surface2);}
           </div>
         </div>
 
-        <!-- Manage existing -->
         <div class="panel">
           <div class="panel-header">
             <div class="panel-title"><i class="fas fa-boxes"></i> INVENTORY — <span id="productCountLabel" style="color:var(--accent);">0 PRODUCTS</span></div>
@@ -836,7 +1215,7 @@ select option{background:var(--surface2);}
       </div>
     </div>
 
-    <!-- ══ INVENTORY ══════════════════════════════════════ -->
+    <!-- ══ INVENTORY ═══════════════════════════════════════ -->
     <div id="p-inventory" class="page">
       <div class="page-header"><div class="page-header-inner">
         <div><div class="page-title">INVENTORY</div><div class="page-sub">STOCK LEVELS · FIREBASE LIVE</div></div>
@@ -844,8 +1223,8 @@ select option{background:var(--surface2);}
           <button class="btn btn-ghost btn-sm" onclick="refreshInventory()"><i class="fas fa-sync-alt"></i> Refresh</button>
         </div>
       </div></div>
-      <div style="padding:24px 36px 36px;">
-        <div class="stat-grid" style="margin-bottom:24px;">
+      <div style="padding:var(--page-pad);">
+        <div class="stat-grid" style="margin-bottom:20px;">
           <div class="stat-card"><div class="stat-label">Total Products</div><div class="stat-value" id="inv-total">0</div></div>
           <div class="stat-card"><div class="stat-label">Total Stock</div><div class="stat-value" id="inv-stock" style="color:var(--accent)">0</div></div>
           <div class="stat-card"><div class="stat-label">Low Stock ≤5</div><div class="stat-value" id="inv-low" style="color:var(--warning)">0</div></div>
@@ -870,7 +1249,7 @@ select option{background:var(--surface2);}
           <button class="btn btn-ghost btn-sm" onclick="refreshOrders()"><i class="fas fa-sync-alt"></i> Refresh</button>
         </div>
       </div></div>
-      <div style="padding:24px 36px 36px;">
+      <div style="padding:var(--page-pad);">
         <div class="tab-bar">
           <button class="tab-btn active" onclick="filterOrders('new',this)">New</button>
           <button class="tab-btn" onclick="filterOrders('delivered',this)">Delivered</button>
@@ -880,7 +1259,7 @@ select option{background:var(--surface2);}
       </div>
     </div>
 
-    <!-- ══ MESSAGES ═══════════════════════════════════════ -->
+    <!-- ══ MESSAGES ════════════════════════════════════════ -->
     <div id="p-messages" class="page">
       <div class="page-header"><div class="page-header-inner">
         <div><div class="page-title">MESSAGES</div><div class="page-sub">USER INQUIRIES</div></div>
@@ -888,7 +1267,7 @@ select option{background:var(--surface2);}
           <button class="btn btn-ghost btn-sm" onclick="refreshMessages()"><i class="fas fa-sync-alt"></i> Refresh</button>
         </div>
       </div></div>
-      <div style="padding:24px 36px 36px;">
+      <div style="padding:var(--page-pad);">
         <div class="tab-bar">
           <button class="tab-btn active" onclick="filterMessages('unread',this)">Unread</button>
           <button class="tab-btn" onclick="filterMessages('all',this)">All</button>
@@ -903,11 +1282,11 @@ select option{background:var(--surface2);}
       <div class="page-header"><div class="page-header-inner">
         <div><div class="page-title">PROFILE</div><div class="page-sub">ADMIN ACCOUNT</div></div>
       </div></div>
-      <div style="padding:24px 36px 36px;max-width:520px;">
+      <div style="padding:var(--page-pad);max-width:520px;">
         <div class="panel">
           <div class="panel-body">
-            <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;">
-              <div style="width:64px;height:64px;border-radius:50%;background:var(--surface2);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--accent);">AU</div>
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:22px;flex-wrap:wrap;">
+              <div style="width:60px;height:60px;border-radius:50%;background:var(--surface2);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--accent);flex-shrink:0;">AU</div>
               <div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;" id="profileName">Aura Admin</div><div class="text-muted" id="profileEmail">admin@aurawatches.com</div></div>
             </div>
             <div class="field"><label>Full Name</label><input type="text" id="pf-name" value="Aura Admin" disabled/></div>
@@ -928,7 +1307,7 @@ select option{background:var(--surface2);}
   </main>
 </div><!-- /appShell -->
 
-<!-- ═══ CHATBOT ══════════════════════════════════════════════ -->
+<!-- ═══ CHATBOT ════════════════════════════════════════════════ -->
 <div id="chatBtn" onclick="toggleChat()"><i class="fas fa-robot"></i></div>
 <div id="chatPanel">
   <div class="chat-header">
@@ -938,7 +1317,7 @@ select option{background:var(--surface2);}
   <div class="chat-messages" id="chatMessages">
     <div class="chat-msg bot">Hi! I'm Aura AI. Ask me about products, orders, inventory or analytics.</div>
   </div>
-  <div style="display:flex;gap:6px;padding:10px;border-top:1px solid var(--border);flex-wrap:wrap;">
+  <div class="chat-quick">
     <button class="btn btn-ghost btn-sm" onclick="quickChat('analyze')">Analyze</button>
     <button class="btn btn-ghost btn-sm" onclick="quickChat('inventory')">Stock</button>
     <button class="btn btn-ghost btn-sm" onclick="quickChat('orders')">Orders</button>
@@ -950,7 +1329,7 @@ select option{background:var(--surface2);}
   </div>
 </div>
 
-<!-- ═══ EDIT PRODUCT MODAL ═══════════════════════════════════ -->
+<!-- ═══ EDIT PRODUCT MODAL ══════════════════════════════════ -->
 <div id="editModal" class="modal-overlay">
   <div class="modal">
     <div class="modal-header">
@@ -981,7 +1360,7 @@ select option{background:var(--surface2);}
   </div>
 </div>
 
-<!-- ═══ ORDER DETAILS MODAL ══════════════════════════════════ -->
+<!-- ═══ ORDER DETAILS MODAL ═════════════════════════════════ -->
 <div id="orderModal" class="modal-overlay">
   <div class="modal" style="max-width:680px;">
     <div class="modal-header">
@@ -1001,8 +1380,8 @@ select option{background:var(--surface2);}
       <div class="modal-close" onclick="document.getElementById('replyModal').classList.remove('open')"><i class="fas fa-times"></i></div>
     </div>
     <div class="modal-body">
-      <div id="replyUserInfo" style="background:var(--surface2);border-radius:4px;padding:12px;margin-bottom:14px;font-family:'DM Mono',monospace;font-size:12px;"></div>
-      <div style="background:var(--surface2);border-radius:4px;padding:12px;margin-bottom:14px;font-size:13px;color:var(--text2);" id="replyOrigMsg"></div>
+      <div id="replyUserInfo" style="background:var(--surface2);border-radius:4px;padding:11px;margin-bottom:12px;font-family:'DM Mono',monospace;font-size:12px;"></div>
+      <div style="background:var(--surface2);border-radius:4px;padding:11px;margin-bottom:12px;font-size:13px;color:var(--text2);" id="replyOrigMsg"></div>
       <div class="field"><label>Your Reply</label><textarea id="replyText" rows="4" placeholder="Type your reply..."></textarea></div>
     </div>
     <div class="modal-footer">
@@ -1012,7 +1391,7 @@ select option{background:var(--surface2);}
   </div>
 </div>
 
-<!-- ═══ FIREBASE + APP JS ═══════════════════════════════════ -->
+<!-- ═══ FIREBASE + APP JS ════════════════════════════════════ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import { getDatabase, ref, push, set, onValue, remove, update, serverTimestamp }
@@ -1031,17 +1410,15 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// ── Helpers ──────────────────────────────────────────────
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function genId(){ return 'LRA-'+Math.random().toString(36).substr(2,6).toUpperCase(); }
 function resolveImg(img){
   if(!img) return null;
   const s = String(img).trim();
-  if(s.startsWith('data:') || s.startsWith('http') || s.startsWith('blob:')) return s;
+  if(s.startsWith('data:')||s.startsWith('http')||s.startsWith('blob:')) return s;
   return s;
 }
 
-// ── Toast ─────────────────────────────────────────────────
 function toast(msg, type='success'){
   const c = document.getElementById('toastContainer');
   const t = document.createElement('div');
@@ -1053,7 +1430,6 @@ function toast(msg, type='success'){
 }
 window.toast = toast;
 
-// ── Auth ──────────────────────────────────────────────────
 const CREDS = { email:'admin@aurawatches.com', password:'123456' };
 const AUTH_KEY = 'auraAdminAuth_v2';
 function isAuth(){ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)||'{}').ok===true; }catch(e){ return false; } }
@@ -1076,7 +1452,6 @@ window.doLogout = function(){
   location.reload();
 };
 
-// ── Navigation ────────────────────────────────────────────
 let currentPage = 'dashboard';
 window.showPage = function(id, btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1104,7 +1479,6 @@ window.closeSidebar = function(){
   document.getElementById('sidebarBackdrop').classList.remove('open');
 };
 
-// ── Connection ────────────────────────────────────────────
 onValue(ref(db,'.info/connected'), snap=>{
   const dot = document.getElementById('connDot');
   const txt = document.getElementById('connText');
@@ -1112,11 +1486,7 @@ onValue(ref(db,'.info/connected'), snap=>{
   else { dot.classList.remove('connected'); txt.textContent='RECONNECTING'; }
 });
 
-// ══════════════════════════════════════════════════════════
-// PRODUCTS — Live from Firebase
-// ══════════════════════════════════════════════════════════
-let _products = {}; // key→product (live cache)
-
+let _products = {};
 onValue(ref(db,'products'), snap=>{
   _products = snap.val() || {};
   if(currentPage==='products') renderProductsGrid();
@@ -1153,7 +1523,7 @@ function productCardHTML(key, p){
         ${colBadge}${typBadge}
       </div>
       <div class="card-name">${esc(p.name)}</div>
-      <div class="text-muted" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;margin-bottom:10px;">${esc(p.id||key)}</div>
+      <div class="text-muted" style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:1px;margin-bottom:9px;">${esc(p.id||key)}</div>
       <div class="card-stats">
         <div class="c-stat"><div class="c-stat-label">Price</div><div class="c-stat-value price-val">${(+p.price||0).toLocaleString()}</div></div>
         <div class="c-stat"><div class="c-stat-label">Qty</div><div class="c-stat-value ${qClass}">${p.quantity||0}</div></div>
@@ -1168,7 +1538,6 @@ function productCardHTML(key, p){
 
 window.refreshProducts = function(){ renderProductsGrid(); toast('Products refreshed','info'); };
 
-// Add product
 window.submitProduct = async function(){
   const name = document.getElementById('p-name').value.trim();
   const price = parseFloat(document.getElementById('p-price').value);
@@ -1198,7 +1567,6 @@ window.submitProduct = async function(){
   finally{ btn.disabled=false; lbl.textContent='PUSH TO DATABASE'; }
 };
 
-// Delete product
 window.deleteProduct = async function(key, name){
   if(!confirm(`Delete "${name}"?`)) return;
   try{
@@ -1207,7 +1575,6 @@ window.deleteProduct = async function(key, name){
   } catch(err){ toast('Delete failed: '+err.message,'error'); }
 };
 
-// Edit modal
 window.openEditModal = function(key){
   const p = _products[key];
   if(!p) return;
@@ -1243,12 +1610,9 @@ window.saveEdit = async function(){
 };
 window.openAddProductModal = function(){
   showPage('products', document.querySelector('[data-page="products"]'));
-  document.getElementById('p-name').focus();
+  setTimeout(()=>document.getElementById('p-name').focus(), 100);
 };
 
-// ══════════════════════════════════════════════════════════
-// INVENTORY
-// ══════════════════════════════════════════════════════════
 let _invFilter = 'all';
 window.filterInventory = function(f, btn){
   _invFilter = f;
@@ -1263,7 +1627,6 @@ function renderInventoryGrid(){
   let filtered = entries;
   if(_invFilter==='low') filtered = entries.filter(([k,p])=>(p.quantity||0)>0&&(p.quantity||0)<=5);
   if(_invFilter==='oos') filtered = entries.filter(([k,p])=>(p.quantity||0)===0);
-  // stats
   document.getElementById('inv-total').textContent = entries.length;
   document.getElementById('inv-stock').textContent = entries.reduce((s,[k,p])=>s+(p.quantity||0),0);
   document.getElementById('inv-low').textContent = entries.filter(([k,p])=>(p.quantity||0)>0&&(p.quantity||0)<=5).length;
@@ -1277,7 +1640,7 @@ function renderInventoryGrid(){
     const img = resolveImg(p.image);
     return `
     <div class="product-card">
-      ${img?`<img class="card-img" src="${esc(img)}" alt="${esc(p.name)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="card-img-placeholder" style="display:none;height:100px"><i class="fas fa-image"></i></div>`:`<div class="card-img-placeholder" style="height:100px"><i class="fas fa-image"></i></div>`}
+      ${img?`<img class="card-img" src="${esc(img)}" alt="${esc(p.name)}" style="height:90px" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="card-img-placeholder" style="display:none;height:90px"><i class="fas fa-image"></i></div>`:`<div class="card-img-placeholder" style="height:90px"><i class="fas fa-image"></i></div>`}
       <div class="card-body">
         <div class="card-name">${esc(p.name)}</div>
         <div class="card-stats">
@@ -1293,9 +1656,6 @@ function renderInventoryGrid(){
   }).join('');
 }
 
-// ══════════════════════════════════════════════════════════
-// ORDERS — from localStorage (website compatibility)
-// ══════════════════════════════════════════════════════════
 let _orderFilter = 'new';
 function loadOrders(){ try{ return JSON.parse(localStorage.getItem('auraOrders')||'[]'); } catch(e){ return []; } }
 function saveOrders(o){ localStorage.setItem('auraOrders', JSON.stringify(o)); }
@@ -1330,8 +1690,8 @@ function renderOrders(){
         <span class="badge" style="background:${statusColor}20;color:${statusColor};border:1px solid ${statusColor}40;font-size:10px;">${esc(o.status.toUpperCase())}</span>
       </div>
       <div style="margin-bottom:8px;font-size:13px;color:var(--text2);">${esc(items)}</div>
-      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);margin-bottom:12px;">${(+o.total||0).toLocaleString()} IQD</div>
-      <div style="display:flex;gap:8px;">
+      <div style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);margin-bottom:11px;">${(+o.total||0).toLocaleString()} IQD</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn btn-ghost btn-sm" onclick="viewOrder('${esc(o.id)}')"><i class="fas fa-eye"></i> Details</button>
         ${o.status!=='completed'?`<button class="btn btn-success btn-sm" onclick="markDelivered('${esc(o.id)}')"><i class="fas fa-check"></i> Delivered</button>`:''}
       </div>
@@ -1354,27 +1714,27 @@ window.viewOrder = function(id){
   const body = document.getElementById('orderModalBody');
   const footer = document.getElementById('orderModalFooter');
   body.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;">
       <div>
-        <div class="stat-label" style="margin-bottom:10px;">CUSTOMER INFO</div>
-        <div style="background:var(--surface2);border-radius:4px;padding:14px;font-size:13px;">
-          <div style="margin-bottom:8px;"><span class="text-muted">Name: </span>${esc(o.customer.name)}</div>
-          <div style="margin-bottom:8px;"><span class="text-muted">Email: </span>${esc(o.customer.email)}</div>
-          <div style="margin-bottom:8px;"><span class="text-muted">Phone: </span>${esc(o.customer.phone)}</div>
+        <div class="stat-label" style="margin-bottom:8px;">CUSTOMER INFO</div>
+        <div style="background:var(--surface2);border-radius:4px;padding:13px;font-size:13px;">
+          <div style="margin-bottom:7px;"><span class="text-muted">Name: </span>${esc(o.customer.name)}</div>
+          <div style="margin-bottom:7px;"><span class="text-muted">Email: </span>${esc(o.customer.email)}</div>
+          <div style="margin-bottom:7px;"><span class="text-muted">Phone: </span>${esc(o.customer.phone)}</div>
           <div><span class="text-muted">Address: </span>${esc(o.customer.address)}</div>
         </div>
-        <div class="stat-label" style="margin:14px 0 8px;">ORDER SUMMARY</div>
-        <div style="background:var(--surface2);border-radius:4px;padding:14px;font-size:13px;">
+        <div class="stat-label" style="margin:13px 0 8px;">ORDER SUMMARY</div>
+        <div style="background:var(--surface2);border-radius:4px;padding:13px;font-size:13px;">
           <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span class="text-muted">Subtotal</span><span>${(+o.total||0).toLocaleString()} IQD</span></div>
           <div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span class="text-muted">Shipping</span><span>${esc(o.shipping)}</span></div>
-          <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:8px;margin-top:4px;"><span style="font-weight:600;">Total</span><span style="color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:18px;">${(+o.total||0).toLocaleString()} IQD</span></div>
+          <div style="display:flex;justify-content:space-between;border-top:1px solid var(--border);padding-top:7px;margin-top:4px;"><span style="font-weight:600;">Total</span><span style="color:var(--accent);font-family:'Bebas Neue',sans-serif;font-size:18px;">${(+o.total||0).toLocaleString()} IQD</span></div>
         </div>
       </div>
       <div>
-        <div class="stat-label" style="margin-bottom:10px;">ORDER ITEMS</div>
-        ${(o.items||[]).map(it=>`<div style="background:var(--surface2);border-radius:4px;padding:12px;margin-bottom:8px;font-size:13px;"><div style="font-weight:500;margin-bottom:4px;">${esc(it.name)}</div><div class="text-muted">Qty: ${it.quantity} · ${(+it.price||0).toLocaleString()} IQD each</div><div style="color:var(--accent);font-family:'DM Mono',monospace;">${((+it.price||0)*(+it.quantity||0)).toLocaleString()} IQD</div></div>`).join('')}
-        <div class="stat-label" style="margin:14px 0 8px;">ORDER INFO</div>
-        <div style="background:var(--surface2);border-radius:4px;padding:14px;font-size:13px;">
+        <div class="stat-label" style="margin-bottom:8px;">ORDER ITEMS</div>
+        ${(o.items||[]).map(it=>`<div style="background:var(--surface2);border-radius:4px;padding:11px;margin-bottom:7px;font-size:13px;"><div style="font-weight:500;margin-bottom:4px;">${esc(it.name)}</div><div class="text-muted">Qty: ${it.quantity} · ${(+it.price||0).toLocaleString()} IQD each</div><div style="color:var(--accent);font-family:'DM Mono',monospace;">${((+it.price||0)*(+it.quantity||0)).toLocaleString()} IQD</div></div>`).join('')}
+        <div class="stat-label" style="margin:13px 0 8px;">ORDER INFO</div>
+        <div style="background:var(--surface2);border-radius:4px;padding:13px;font-size:13px;">
           <div style="margin-bottom:6px;"><span class="text-muted">ID: </span><span style="font-family:'DM Mono',monospace;">${esc(o.id)}</span></div>
           <div style="margin-bottom:6px;"><span class="text-muted">Date: </span>${esc(o.date)}</div>
           <div><span class="text-muted">Payment: </span>${esc(o.paymentType||'Card')}</div>
@@ -1401,9 +1761,6 @@ window.printInvoice = function(id){
   w.document.close(); w.focus(); w.print();
 };
 
-// ══════════════════════════════════════════════════════════
-// MESSAGES
-// ══════════════════════════════════════════════════════════
 let _msgFilter = 'unread';
 let _currentReplyId = null;
 function loadMessages(){ try{ return JSON.parse(localStorage.getItem('auraMessages')||'[]'); } catch(e){ return []; } }
@@ -1434,13 +1791,13 @@ function renderMessages(){
           <div style="font-weight:600;">${esc(m.userName)}</div>
           <div class="text-muted" style="font-family:'DM Mono',monospace;font-size:10px;">${esc(m.userEmail)}</div>
         </div>
-        <div style="display:flex;gap:6px;align-items:center;">
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
           ${m.replied?'<span class="badge badge-active" style="font-size:9px;">REPLIED</span>':''}
           <span class="text-muted" style="font-family:\'DM Mono\',monospace;font-size:10px;">${new Date(m.date).toLocaleDateString()}</span>
         </div>
       </div>
-      <div style="background:var(--surface2);border-radius:4px;padding:12px;font-size:13px;color:var(--text2);margin-bottom:12px;">${esc(m.message)}</div>
-      <div style="display:flex;gap:8px;">
+      <div style="background:var(--surface2);border-radius:4px;padding:11px;font-size:13px;color:var(--text2);margin-bottom:11px;">${esc(m.message)}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
         ${!m.read?`<button class="btn btn-blue btn-sm" onclick="markRead('${esc(m.id)}')"><i class="fas fa-check"></i> Mark Read</button>`:''}
         <button class="btn btn-success btn-sm" onclick="openReply('${esc(m.id)}')"><i class="fas fa-reply"></i> Reply</button>
       </div>
@@ -1474,27 +1831,18 @@ window.sendReply = function(){
   if(idx!==-1){ msgs[idx].read=true; msgs[idx].replied=true; msgs[idx].replyText=txt; msgs[idx].replyDate=new Date().toISOString(); saveMessages(msgs); updateBadges(); renderMessages(); toast('Reply sent!','success'); document.getElementById('replyModal').classList.remove('open'); }
 };
 
-// ══════════════════════════════════════════════════════════
-// BADGES
-// ══════════════════════════════════════════════════════════
 function updateBadges(){
-  // Low stock from Firebase
   const low = Object.values(_products).filter(p=>(p.quantity||0)>0&&(p.quantity||0)<=5).length;
   const lsBadge = document.getElementById('lowStockBadge');
   if(low>0){ lsBadge.textContent=low; lsBadge.classList.remove('hidden'); } else lsBadge.classList.add('hidden');
-  // Orders
   const newOrd = loadOrders().filter(o=>['pending','processing'].includes(o.status)).length;
   const ordBadge = document.getElementById('newOrderBadge');
   if(newOrd>0){ ordBadge.textContent=newOrd; ordBadge.classList.remove('hidden'); } else ordBadge.classList.add('hidden');
-  // Messages
   const unread = loadMessages().filter(m=>!m.read).length;
   const msgBadge = document.getElementById('unreadMsgBadge');
   if(unread>0){ msgBadge.textContent=unread; msgBadge.classList.remove('hidden'); } else msgBadge.classList.add('hidden');
 }
 
-// ══════════════════════════════════════════════════════════
-// DASHBOARD — live from Firebase products
-// ══════════════════════════════════════════════════════════
 let _forecastChart=null, _sentimentChart=null, _yearlyChart=null;
 
 function updateDashboardLive(){
@@ -1507,28 +1855,23 @@ function updateDashboardLive(){
 window.updateDashboard = function(){
   const tr = document.getElementById('timeRange')?.value||'30_days';
   let multiplier = tr==='7_days'?0.8:tr==='90_days'?1.3:1;
-  const prodCount = Object.keys(_products).length;
   const totalStock = Object.values(_products).reduce((s,p)=>s+(p.quantity||0),0);
   const orders = loadOrders();
-  // Stats
   document.getElementById('st-visitors').textContent = '+' + Math.round(8420*multiplier).toLocaleString();
   document.getElementById('st-sales').textContent = Math.round(28500*multiplier).toLocaleString() + ' IQD';
   document.getElementById('st-orders').textContent = orders.length + Math.round(18*multiplier);
-  // Top product
   const allP = Object.values(_products);
   if(allP.length){
     const top = allP.reduce((a,b)=>(b.price>a.price?b:a));
     document.getElementById('st-top').textContent = top.name;
     document.getElementById('st-top-rev').textContent = (+top.price||0).toLocaleString()+' IQD';
   }
-  // Forecasts
   const nm = Math.round(34200*multiplier);
   document.getElementById('nextMonthSales').textContent = nm.toLocaleString()+' IQD';
   document.getElementById('salesGrowth').textContent = `+${(18.3*multiplier).toFixed(1)}% vs last month`;
   document.getElementById('invForecast').textContent = (totalStock||2150)+' units';
   const lowCount = allP.filter(p=>(p.quantity||0)<=5&&(p.quantity||0)>0).length;
   document.getElementById('invChange').textContent = `Restock recommended for ${lowCount||3} products`;
-  // Forecast chart
   buildForecastChart(multiplier);
 };
 
@@ -1548,7 +1891,7 @@ function buildForecastChart(mult=1){
   _forecastChart = new Chart(ctx,{
     type:'line',
     data:{labels,datasets:[{label:'Forecast',data:vals,borderColor:'#c9f53b',backgroundColor:'rgba(201,245,59,.06)',tension:.4,fill:true,pointRadius:2,pointHoverRadius:4,pointBackgroundColor:'#c9f53b'}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#555',callback:v=>v.toLocaleString()}},x:{grid:{display:false},ticks:{color:'#555',maxTicksLimit:8}}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#555',callback:v=>v.toLocaleString()}},x:{grid:{display:false},ticks:{color:'#555',maxTicksLimit:6}}}}
   });
 }
 
@@ -1567,12 +1910,12 @@ function updateForecastTable(){
     else { recHTML='Stable'; recClass='rec-stable'; }
     const img = resolveImg(p.image);
     return `<tr>
-      <td style="display:flex;align-items:center;gap:8px;">
-        ${img?`<img src="${esc(img)}" style="width:28px;height:28px;border-radius:3px;object-fit:cover;" onerror="this.style.display='none'">`:''}
-        <span style="font-size:12px;font-weight:500;">${esc(p.name)}</span>
+      <td style="display:flex;align-items:center;gap:8px;min-width:120px;">
+        ${img?`<img src="${esc(img)}" style="width:26px;height:26px;border-radius:3px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">`:''}
+        <span style="font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.name)}</span>
       </td>
-      <td style="color:#a78bfa;font-family:'DM Mono',monospace;font-size:12px;">${demand} units</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;color:${after<=3?'var(--danger)':after<=5?'var(--warning)':'var(--success)'};">${after}</td>
+      <td style="color:#a78bfa;font-family:'DM Mono',monospace;font-size:12px;white-space:nowrap;">${demand} units</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:${after<=3?'var(--danger)':after<=5?'var(--warning)':'var(--success)'};white-space:nowrap;">${after}</td>
       <td><span class="${recClass}">${recHTML}</span></td>
     </tr>`;
   }).join('');
@@ -1584,12 +1927,11 @@ function updateSentiments(){
   const withScore = prods.map(p=>({name:p.name,score:Math.floor(Math.random()*100)}));
   const loved = [...withScore].sort((a,b)=>b.score-a.score).slice(0,3);
   const hated = [...withScore].sort((a,b)=>a.score-b.score).slice(0,3);
-  const renderList = (arr, good)=>arr.map(p=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px;"><span>${esc(p.name)}</span><span style="font-family:'DM Mono',monospace;background:${good?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)'};color:${good?'var(--success)':'var(--danger)'};padding:1px 6px;border-radius:2px;">${p.score}%</span></div>`).join('');
+  const renderList = (arr,good)=>arr.map(p=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:11px;gap:4px;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(p.name)}</span><span style="font-family:'DM Mono',monospace;background:${good?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)'};color:${good?'var(--success)':'var(--danger)'};padding:1px 5px;border-radius:2px;flex-shrink:0;">${p.score}%</span></div>`).join('');
   document.getElementById('mostLoved').innerHTML = renderList(loved,true);
   document.getElementById('mostHated').innerHTML = renderList(hated,false);
 }
 
-// Charts init
 function buildSentimentChart(){
   const ctx = document.getElementById('sentimentChart');
   if(!ctx||_sentimentChart) return;
@@ -1620,13 +1962,12 @@ function renderFinances(){
   }
   const months=[{n:'January',v:42500},{n:'February',v:68000},{n:'March',v:52000},{n:'April',v:-15000},{n:'May',v:37500},{n:'June',v:49000},{n:'July',v:23000},{n:'August',v:58000},{n:'September',v:44000},{n:'October',v:61000},{n:'November',v:79000},{n:'December',v:102000}];
   document.getElementById('monthlyList').innerHTML = months.map(m=>`
-    <div style="display:flex;justify-content:space-between;background:var(--surface2);padding:10px 14px;border-radius:4px;">
+    <div style="display:flex;justify-content:space-between;background:var(--surface2);padding:9px 13px;border-radius:4px;gap:8px;">
       <span style="font-family:'DM Mono',monospace;font-size:12px;">${m.n}</span>
       <span style="font-family:'DM Mono',monospace;font-size:12px;color:${m.v<0?'var(--danger)':'var(--success)'};">${m.v>0?'+':''}${m.v.toLocaleString()} IQD</span>
     </div>`).join('');
 }
 
-// Profile
 let _profileEditing = false;
 window.loadProfile = function(){
   const p = JSON.parse(localStorage.getItem('auraAdminProfile')||'{}');
@@ -1649,13 +1990,12 @@ window.toggleProfileEdit = function(){
     document.getElementById('profileName').textContent=nm;
     document.getElementById('profileEmail').textContent=em;
     document.getElementById('pwSection').style.display='none';
-    ['pf-name','pf-email','pf-cur','pf-new','pf-conf'].forEach(id=>{ document.getElementById(id).disabled=true; });
+    ['pf-name','pf-email','pf-cur','pf-new','pf-conf'].forEach(id=>{ const el=document.getElementById(id); if(el) el.disabled=true; });
     btn.textContent='EDIT PROFILE';
     toast('Profile updated','success');
   }
 };
 
-// Chat
 window.toggleChat = function(){
   const p=document.getElementById('chatPanel');
   p.style.display = p.style.display==='flex' ? 'none' : 'flex';
@@ -1686,11 +2026,7 @@ window.sendChat = function(){
   }, 600);
 };
 
-// ══════════════════════════════════════════════════════════
-// INIT
-// ══════════════════════════════════════════════════════════
 function initApp(){
-  // Load initial data
   updateBadges();
   buildSentimentChart();
   updateDashboard();
@@ -1698,7 +2034,6 @@ function initApp(){
   updateSentiments();
 }
 
-// Boot
 if(isAuth()){
   document.getElementById('loginGate').style.display='none';
   document.getElementById('appShell').style.display='flex';
