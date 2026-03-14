@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>AURA | Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; scroll-behavior: smooth; -webkit-tap-highlight-color: transparent; }
+        html, body { background-color: #222; min-height: 100vh; width: 100vw; display: flex; justify-content: center; overflow-x: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        #viewport { position: relative; width: 100%; background: #e0ddd6; transition: all 0.8s cubic-bezier(0.2, 1, 0.3, 1); display: flex; flex-direction: column; }
+        #notification-bar { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background-color: #5d4e3f; color: white; padding: 14px 40px; border-radius: 30px; z-index: 9999; transition: top 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); font-weight: 600; box-shadow: 0 4px 15px rgba(93, 78, 63, 0.3); text-align: center; min-width: 300px; max-width: 90%; }
+        #spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #bfa37e; animation: spin 1s linear infinite; margin: 5px auto; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        nav { position: fixed; top: 0; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 25px 40px; z-index: 1000; background: linear-gradient(to bottom, rgba(93, 78, 63, 0.8), transparent); transition: 0.4s; direction: ltr; }
+        .scrolled-nav { background: rgba(224, 221, 214, 0.95) !important; border-bottom: 1px solid #bfa37e; }
+        .brand-logo-img { height: 70px; width: auto; filter: contrast(130%); cursor: pointer; }
+        .hamburger-menu { display: none; flex-direction: column; justify-content: space-between; width: 30px; height: 21px; cursor: pointer; z-index: 1001; margin-right: 15px; }
+        .hamburger-menu span { display: block; width: 100%; height: 3px; background-color: white; border-radius: 3px; transition: all 0.3s ease; }
+        .light-nav .hamburger-menu span { background-color: #5d4e3f; }
+        .hamburger-menu.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+        .hamburger-menu.active span:nth-child(2) { opacity: 0; }
+        .hamburger-menu.active span:nth-child(3) { transform: rotate(-45deg) translate(7px, -7px); }
+        .mobile-nav-menu { position: fixed; top: 0; left: -100%; width: 280px; height: 100vh; background: white; z-index: 10000; padding: 100px 30px 30px; transition: left 0.4s cubic-bezier(0.19, 1, 0.22, 1); box-shadow: 2px 0 20px rgba(93, 78, 63, 0.2); overflow-y: auto; direction: ltr; }
+        .mobile-nav-menu.open { left: 0; }
+        .mobile-nav-menu a { display: block; color: #5d4e3f; text-decoration: none; text-transform: uppercase; font-size: 1.1rem; letter-spacing: 2px; padding: 15px 0; border-bottom: 1px solid #e0ddd6; transition: all 0.3s ease; }
+        .mobile-nav-menu a:hover { color: #bfa37e; padding-left: 10px; }
+        .mobile-nav-close { position: absolute; top: 20px; right: 20px; font-size: 2rem; color: #5d4e3f; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.3s ease; }
+        .mobile-nav-close:hover { background-color: rgba(93, 78, 63, 0.1); transform: scale(1.1); }
+        .nav-menu { display: flex; gap: 30px; }
+        .nav-menu a { color: white !important; text-decoration: none; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 2px; opacity: 0.9; transition: 0.3s; font-weight: bold; cursor: pointer; position: relative; padding-bottom: 5px; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7); }
+        .nav-menu a::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: #bfa37e; transition: width 0.3s ease; }
+        .nav-menu a:hover::after { width: 100%; }
+        .nav-menu a.active { border-bottom: 2px solid #bfa37e; opacity: 1; }
+        .light-nav a { color: #5d4e3f !important; text-shadow: none; }
+        .nav-actions { display: flex; gap: 5px; align-items: center; }
+        .lang-dropdown { position: relative; display: inline-block; margin-right: 10px; direction: ltr; }
+        .lang-dropdown-btn { background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white; width: 70px; height: 40px; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 5px; touch-action: manipulation; }
+        .lang-dropdown-btn:hover { background: rgba(255,255,255,0.2); }
+        .lang-dropdown-content { display: none; position: absolute; top: 45px; right: 0; background: white; min-width: 100px; box-shadow: 0 8px 16px rgba(93,78,63,0.15); border-radius: 8px; overflow: hidden; z-index: 9999; border: 1px solid #e0ddd6; direction: ltr; }
+        .lang-dropdown-content.show { display: block; }
+        .lang-option { padding: 10px 12px; text-align: left; cursor: pointer; color: #5d4e3f; font-weight: 500; transition: background 0.2s; }
+        .lang-option:hover { background: #f0ede8; }
+        .lang-option.active { background: #bfa37e; color: white; }
+        .light-nav .lang-dropdown-btn { border-color: #5d4e3f; color: #5d4e3f; }
+        .icon-btn { background: none; border: none; cursor: pointer; transition: 0.3s; position: relative; padding: 8px; border-radius: 50%; }
+        .icon-btn:hover { background: rgba(255, 255, 255, 0.1); transform: scale(1.1); }
+        .icon-btn img { height: 20px; filter: brightness(0) invert(1); opacity: 0.8; }
+        .light-nav .icon-btn img { filter: brightness(0) saturate(100%) invert(23%) sepia(8%) saturate(1732%) hue-rotate(349deg) brightness(92%) contrast(86%) !important; opacity: 0.7; }
+        .icon-btn .auth-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: #bfa37e; border: 2px solid white; display: none; }
+        .icon-btn.user-signed-in .auth-dot { display: block; }
+
+        .hero { position: relative; width: 100%; height: 100vh; flex-shrink: 0; overflow: hidden; }
+        .hero-video { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 1; }
+        .scroll-arrow { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 10; cursor: pointer; animation: bounce 2s infinite; }
+        .scroll-arrow img { width: 40px; height: 40px; filter: brightness(0) invert(1); opacity: 0.9; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); } 40% { transform: translateY(-10px) translateX(-50%); } 60% { transform: translateY(-5px) translateX(-50%); } }
+
+        /* ─── HOME FEATURED COLLECTION ─── */
+        .collection-section { padding: 80px 10%; background: #e0ddd6; display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px 20px; justify-items: center; }
+        .collection-loading { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: #5d4e3f; gap: 15px; }
+        .collection-loading-spinner { width: 40px; height: 40px; border: 3px solid rgba(93, 78, 63, 0.2); border-radius: 50%; border-top-color: #bfa37e; animation: spin 1s linear infinite; }
+        .collection-loading p { font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; opacity: 0.7; }
+        .product-card { text-align: center; width: 100%; max-width: 320px; margin: 0 auto; cursor: pointer; transition: all 0.3s ease; }
+        .product-img-wrap { background: white; margin-bottom: 15px; box-shadow: 0 4px 15px rgba(93, 78, 63, 0.1); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 4px; position: relative; }
+        .product-img-wrap:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 10px 25px rgba(93, 78, 63, 0.15); }
+        .product-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
+        .product-img-wrap:hover img { transform: scale(1.05); }
+        .product-name { font-size: 0.9rem; color: #5d4e3f; margin-bottom: 8px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 5px; }
+        .product-price { color: #5d4e3f; font-weight: bold; font-size: 1rem; padding-top: 5px; border-top: 1px solid #bfa37e; }
+        .category-label { font-size: 0.75rem; color: #8b7355; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; font-weight: 400; text-align: center; }
+        .product-hover-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to top, rgba(93, 78, 63, 0.98) 0%, rgba(93, 78, 63, 0.9) 50%, rgba(93, 78, 63, 0.7) 100%); color: white; padding: 25px 20px; display: flex; flex-direction: column; justify-content: flex-end; opacity: 0; transition: opacity 0.4s ease; pointer-events: none; z-index: 5; backdrop-filter: blur(3px); border-radius: 4px; }
+        .product-img-wrap:hover .product-hover-overlay { opacity: 1; }
+        .overlay-name { font-weight: bold; font-size: 1.2rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; color: white; transform: translateY(20px); transition: transform 0.4s ease 0.1s; line-height: 1.3; }
+        .overlay-price { color: #bfa37e; font-weight: bold; font-size: 1.3rem; margin-bottom: 12px; transform: translateY(20px); transition: transform 0.4s ease 0.15s; }
+        .overlay-description { font-size: 0.9rem; line-height: 1.5; opacity: 0.95; margin-bottom: 15px; transform: translateY(20px); transition: transform 0.4s ease 0.2s; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+        .overlay-hint { font-size: 0.8rem; opacity: 0.9; font-style: italic; transform: translateY(20px); transition: transform 0.4s ease 0.25s; border-top: 1px solid rgba(255,255,255,0.4); padding-top: 12px; margin-top: 5px; text-align: center; }
+        .product-img-wrap:hover .overlay-name, .product-img-wrap:hover .overlay-price, .product-img-wrap:hover .overlay-description, .product-img-wrap:hover .overlay-hint { transform: translateY(0); }
+
+        /* ─── SIDE PANELS ─── */
+        .side-panel { position: fixed; top: 0; right: -420px; width: 380px; height: 100%; background: white; z-index: 2000; transition: 0.6s cubic-bezier(0.19, 1, 0.22, 1); padding: 50px 30px; color: #5d4e3f; border-left: 1px solid #e0ddd6; display: flex; flex-direction: column; box-shadow: 0 15px 40px rgba(93, 78, 63, 0.3); overflow-y: auto; -webkit-overflow-scrolling: touch; }
+        .side-panel.open { right: 0; z-index: 10000 !important; }
+        .panel-header { display: flex; justify-content: space-between; align-items: center; font-size: 1.5rem; color: #5d4e3f; margin-bottom: 30px; letter-spacing: 2px; border-bottom: 2px solid #bfa37e; padding-bottom: 10px; font-weight: 600; font-family: 'Cormorant Garamond', serif; }
+        .close-panel { cursor: pointer; font-size: 1.4rem; line-height: 1; color: white; transition: all 0.3s ease; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #bfa37e !important; border: 2px solid white !important; box-shadow: 0 2px 10px rgba(191, 163, 126, 0.3); }
+        .close-panel:hover { background: #d4b794 !important; transform: scale(1.1) !important; }
+        .cart-content { flex: 1; overflow-y: auto; margin-bottom: 20px; -webkit-overflow-scrolling: touch; }
+        .cart-item { background: #f9f7f4; border-radius: 8px; padding: 15px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; position: relative; box-shadow: 0 3px 10px rgba(93, 78, 63, 0.1); border: 1px solid #e0ddd6; }
+        .cart-item-image { width: 70px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #e0ddd6; flex-shrink: 0; }
+        .cart-item-details { flex: 1; min-width: 0; }
+        .cart-item-name { color: #5d4e3f; font-weight: 600; margin-bottom: 5px; font-size: 0.9rem; }
+        .cart-item-price { color: #5d4e3f; font-weight: bold; font-size: 0.9rem; }
+        .cart-item-quantity { display: flex; align-items: center; gap: 10px; margin-top: 5px; }
+        .quantity-btn { background: #5d4e3f; color: white; border: none; width: 25px; height: 25px; border-radius: 25px; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; touch-action: manipulation; }
+        .quantity-btn:hover { background: #4d4033; transform: translateY(-2px); }
+        .quantity-value { color: #5d4e3f; font-weight: 600; min-width: 20px; text-align: center; }
+        .remove-item-btn { position: absolute; top: 5px; right: 5px; background: #8b7355; color: white; border: none; width: 25px; height: 25px; border-radius: 25px; cursor: pointer; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; touch-action: manipulation; }
+        .remove-item-btn:hover { background: #7a6348; transform: translateY(-2px) scale(1.1); }
+        .cart-footer { margin-top: auto; padding-top: 20px; border-top: 2px solid #e0ddd6; }
+        .checkout-btn { background: #5d4e3f; color: white; border: none; padding: 15px; border-radius: 25px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; width: 100%; display: flex; align-items: center; justify-content: center; text-transform: uppercase; letter-spacing: 1px; touch-action: manipulation; }
+        .checkout-btn:hover { background: #4d4033; transform: translateY(-2px); }
+        .empty-cart { text-align: center; color: #5d4e3f; padding: 40px 0; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; line-height: 1.8; }
+
+        /* ─── PROFILE PANEL ─── */
+        .profile-panel-btn { border: none; padding: 13px 20px; border-radius: 25px; font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; width: 100%; text-transform: uppercase; letter-spacing: 1px; }
+        .profile-panel-btn.primary { background: #5d4e3f; color: white; }
+        .profile-panel-btn.primary:hover { background: #4d4033; transform: translateY(-2px); }
+        .profile-panel-btn.secondary { background: transparent; color: #5d4e3f; border: 1px solid #bfa37e; }
+        .profile-panel-btn.secondary:hover { background: #f0ede8; transform: translateY(-2px); }
+        .profile-panel-btn.danger { background: #8b7355; color: white; }
+        .profile-panel-btn.danger:hover { background: #7a6348; transform: translateY(-2px); }
+        .profile-panel-btn.logout { background: #7a6a5a; color: white; }
+        .profile-panel-btn.logout:hover { background: #695847; transform: translateY(-2px); }
+        .profile-info-card { background: #f9f7f4; border-radius: 10px; padding: 22px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #e0ddd6; margin-bottom: 18px; }
+        .profile-avatar-large { width: 80px; height: 80px; border-radius: 50%; background: #5d4e3f; margin: 0 auto 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; border: 3px solid #bfa37e; font-family: 'Cormorant Garamond', serif; letter-spacing: 1px; }
+        .profile-full-name { color: #5d4e3f; font-size: 1.25rem; font-weight: 600; text-align: center; font-family: 'Cormorant Garamond', serif; margin-bottom: 4px; }
+        .profile-user-email { color: #8b7355; font-size: 0.82rem; text-align: center; margin-bottom: 4px; }
+        .profile-user-city { color: #8b7355; font-size: 0.78rem; text-align: center; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px; }
+        .profile-detail-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid #e0ddd6; font-size: 0.83rem; }
+        .profile-detail-row:last-child { border-bottom: none; }
+        .profile-detail-label { color: #8b7355; font-weight: 500; font-size: 0.72rem; letter-spacing: 1px; text-transform: uppercase; }
+        .profile-detail-value { color: #5d4e3f; font-weight: 500; }
+        .profile-signed-in-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+
+        /* ─── AUTH MODAL ─── */
+        .auth-backdrop { display: none; position: fixed; inset: 0; background: rgba(20,14,8,0.78); backdrop-filter: blur(7px); z-index: 7000; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .auth-backdrop.open { display: flex; }
+        .auth-modal { width: 100%; max-width: 460px; background: #faf8f5; border-radius: 2px; overflow: hidden; animation: authReveal 0.4s cubic-bezier(0.22, 1, 0.36, 1); position: relative; box-shadow: 0 40px 80px rgba(20,14,8,0.45); }
+        @keyframes authReveal { from { opacity: 0; transform: translateY(28px) scale(0.97); } to { opacity: 1; transform: none; } }
+        .auth-modal-header { background: #5d4e3f; padding: 32px 38px 24px; text-align: center; position: relative; overflow: hidden; }
+        .auth-modal-header::before { content: ''; position: absolute; top: -50px; right: -50px; width: 160px; height: 160px; border-radius: 50%; background: rgba(191,163,126,0.1); }
+        .auth-modal-header::after  { content: ''; position: absolute; bottom: -40px; left: -30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(191,163,126,0.07); }
+        .auth-brand { font-family: 'Cormorant Garamond', serif; font-size: 36px; letter-spacing: 10px; color: #ede5d8; font-weight: 300; position: relative; z-index: 1; }
+        .auth-tagline { font-size: 8px; letter-spacing: 4px; color: #bfa37e; text-transform: uppercase; margin-top: 4px; position: relative; z-index: 1; }
+        .auth-close-btn { position: absolute; top: 12px; right: 12px; width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; color: white; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; z-index: 2; }
+        .auth-close-btn:hover { background: rgba(255,255,255,0.28); transform: scale(1.1); }
+        .auth-tabs { display: flex; background: rgba(0,0,0,0.18); margin-top: 18px; position: relative; z-index: 1; }
+        .auth-tab-btn { flex: 1; padding: 10px 8px; background: transparent; border: none; font-family: 'Montserrat', sans-serif; font-size: 9px; letter-spacing: 2.5px; color: rgba(237,229,216,0.5); cursor: pointer; text-transform: uppercase; transition: all 0.2s; }
+        .auth-tab-btn.active { background: rgba(191,163,126,0.22); color: #ede5d8; }
+        .auth-modal-body { padding: 28px 34px 34px; }
+        .auth-form-panel { display: none; }
+        .auth-form-panel.active { display: block; animation: formIn 0.22s ease; }
+        @keyframes formIn { from { opacity: 0; transform: translateX(6px); } to { opacity: 1; transform: none; } }
+        .auth-field { margin-bottom: 13px; }
+        .auth-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 13px; }
+        .auth-label { display: block; font-size: 8.5px; letter-spacing: 2px; color: #8b7355; text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
+        .auth-input { width: 100%; background: white; border: 1px solid #d5c8b8; color: #3d2e1e; padding: 10px 13px; font-family: 'Montserrat', sans-serif; font-size: 13px; outline: none; border-radius: 2px; transition: border-color 0.2s; }
+        .auth-input:focus { border-color: #bfa37e; box-shadow: 0 0 0 3px rgba(191,163,126,0.14); }
+        .auth-input::placeholder { color: #c0b0a0; }
+        .auth-pw-wrap { position: relative; }
+        .auth-pw-wrap .auth-input { padding-right: 40px; }
+        .auth-pw-eye { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #bfa37e; cursor: pointer; font-size: 13px; padding: 3px; }
+        .phone-input-row { display: flex; gap: 8px; }
+        .phone-code-input { width: 80px; flex-shrink: 0; }
+        .auth-section-label { font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: #bfa37e; display: flex; align-items: center; gap: 10px; margin: 16px 0 12px; }
+        .auth-section-label::before, .auth-section-label::after { content: ''; flex: 1; height: 1px; background: #e0d8ce; }
+        .auth-error-box { background: rgba(180,50,40,0.07); border: 1px solid rgba(180,50,40,0.2); color: #b43228; font-size: 11px; padding: 9px 13px; border-radius: 2px; margin-bottom: 13px; display: none; line-height: 1.5; }
+        .auth-success-box { background: rgba(39,140,80,0.07); border: 1px solid rgba(39,140,80,0.22); color: #1f7a44; font-size: 11px; padding: 9px 13px; border-radius: 2px; margin-bottom: 13px; display: none; line-height: 1.5; }
+        .auth-submit { width: 100%; background: #5d4e3f; color: #ede5d8; border: none; padding: 13px; font-family: 'Cormorant Garamond', serif; font-size: 17px; letter-spacing: 5px; cursor: pointer; border-radius: 2px; transition: background 0.2s; margin-top: 6px; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .auth-submit:hover { background: #4d4033; }
+        .auth-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+        .auth-mini-spinner { width: 15px; height: 15px; border: 2px solid rgba(237,229,216,0.3); border-top-color: #ede5d8; border-radius: 50%; animation: spin 0.6s linear infinite; display: none; }
+        .auth-footer-link { text-align: center; margin-top: 13px; font-size: 11px; color: #8b7355; }
+        .auth-footer-link a { color: #bfa37e; cursor: pointer; text-decoration: underline; }
+
+        /* ─── CHANGE PASSWORD MODAL ─── */
+        .cpw-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 8000; justify-content: center; align-items: center; padding: 20px; }
+        .cpw-modal.open { display: flex; }
+        .cpw-modal-content { background: white; width: 90%; max-width: 380px; border-radius: 4px; padding: 30px; animation: authReveal 0.3s ease; box-shadow: 0 15px 40px rgba(93,78,63,0.3); }
+        .cpw-modal-content h3 { font-family: 'Cormorant Garamond', serif; color: #5d4e3f; font-size: 1.5rem; text-align: center; border-bottom: 2px solid #bfa37e; padding-bottom: 10px; margin-bottom: 20px; }
+        .cpw-actions { display: flex; gap: 12px; justify-content: center; margin-top: 20px; }
+        .cpw-btn { padding: 11px 22px; border-radius: 25px; font-weight: 600; cursor: pointer; border: none; font-size: 0.83rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
+        .cpw-btn.cancel { background: #e0ddd6; color: #5d4e3f; }
+        .cpw-btn.confirm { background: #5d4e3f; color: white; }
+
+        /* ─── DELETE MODAL ─── */
+        .del-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 8000; justify-content: center; align-items: center; padding: 20px; }
+        .del-modal.open { display: flex; }
+        .del-modal-content { background: white; width: 90%; max-width: 380px; border-radius: 4px; padding: 30px; text-align: center; animation: authReveal 0.3s ease; }
+        .del-modal-content h3 { font-family: 'Cormorant Garamond', serif; color: #8b7355; font-size: 1.4rem; border-bottom: 2px solid #bfa37e; padding-bottom: 10px; margin-bottom: 14px; }
+        .del-modal-content p { color: #5d4e3f; line-height: 1.6; margin-bottom: 22px; font-size: 0.88rem; }
+        .del-modal-actions { display: flex; gap: 12px; justify-content: center; }
+        .del-btn { padding: 11px 22px; border-radius: 25px; font-weight: 600; cursor: pointer; border: none; font-size: 0.83rem; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s ease; }
+        .del-btn.cancel { background: #e0ddd6; color: #5d4e3f; }
+        .del-btn.confirm-del { background: #8b7355; color: white; }
+
+        /* ─── PRODUCT MODAL ─── */
+        .product-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 3000; justify-content: center; align-items: center; padding: 20px; }
+        .product-modal-content { background: white; max-width: 600px; width: 90%; display: grid; grid-template-columns: 1fr 1fr; gap: 25px; padding: 30px; border-radius: 4px; position: relative; animation: authReveal 0.3s ease; box-shadow: 0 15px 40px rgba(93, 78, 63, 0.3); max-height: 90vh; overflow-y: auto; }
+        .product-modal-close { position: absolute; top: 15px; right: 15px; width: 32px; height: 32px; border-radius: 50%; background: #bfa37e !important; border: 2px solid white !important; font-size: 18px; font-weight: bold; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10; touch-action: manipulation; box-shadow: 0 2px 10px rgba(191, 163, 126, 0.5); }
+        .product-modal-close:hover { background: #d4b794 !important; transform: scale(1.1) !important; }
+        .product-modal-image { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 4px; box-shadow: 0 4px 15px rgba(93, 78, 63, 0.15); }
+        .product-modal-details { display: flex; flex-direction: column; }
+        .product-modal-name { font-size: 1.5rem; color: #5d4e3f; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; font-family: 'Cormorant Garamond', serif; }
+        .product-modal-price { font-size: 1.6rem; color: #bfa37e; font-weight: bold; margin-bottom: 20px; }
+        .product-modal-desc { color: #5d4e3f; line-height: 1.6; margin-bottom: 25px; font-size: 0.95rem; }
+        .product-modal-quantity { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
+        .product-modal-quantity label { color: #5d4e3f; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .product-modal-quantity input { width: 70px; padding: 8px; border: 1px solid #bfa37e; border-radius: 4px; font-size: 1rem; text-align: center; outline: none; }
+        .product-modal-actions { display: flex; gap: 15px; margin-top: auto; }
+        .add-to-cart-modal { flex: 1; background: #5d4e3f; color: white; border: none; padding: 14px; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; touch-action: manipulation; font-size: 0.8rem; }
+        .add-to-cart-modal:hover { background: #4d4033; transform: translateY(-2px); }
+        .buy-now-modal { flex: 1; background: #bfa37e; color: white; border: none; padding: 14px; border-radius: 25px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px; touch-action: manipulation; font-size: 0.8rem; }
+        .buy-now-modal:hover { background: #d4b794; transform: translateY(-2px); }
+
+        /* ─── OUR COLLECTION WRAPPER ─── */
+        .our-collection-wrapper { background: #1a1612; width: 100%; }
+        .our-collection-header { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 70px 10% 40px; text-align: center; }
+        .our-collection-eyebrow { font-family: 'Cormorant Garamond', serif; font-size: 0.75rem; letter-spacing: 5px; color: #bfa37e; text-transform: uppercase; margin-bottom: 14px; opacity: 0.85; font-style: italic; }
+        .our-collection-title { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 300; color: #f0ebe4; letter-spacing: 6px; text-transform: uppercase; font-family: 'Cormorant Garamond', serif; margin-bottom: 16px; line-height: 1.1; }
+        .our-collection-title span { color: #bfa37e; }
+        .our-collection-divider { width: 60px; height: 1px; background: #bfa37e; margin: 0 auto 18px; }
+        .our-collection-subtitle { color: rgba(240,235,228,0.55); font-size: 0.88rem; letter-spacing: 1.5px; max-width: 480px; line-height: 1.7; }
+
+        /* ─── CATEGORY SECTION HEADER (NEW) ─── */
+        .oc-category-section { width: 100%; }
+        .oc-category-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 50px 4% 24px;
+        }
+        .oc-category-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(191, 163, 126, 0.25);
+        }
+        .oc-category-label {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+            font-weight: 300;
+            color: #bfa37e;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            white-space: nowrap;
+            font-style: italic;
+            flex-shrink: 0;
+        }
+        .oc-category-count {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.65rem;
+            letter-spacing: 3px;
+            color: rgba(191,163,126,0.5);
+            text-transform: uppercase;
+            margin-left: -16px;
+            flex-shrink: 0;
+        }
+
+        /* ─── COLLECTION GRID ─── */
+        .our-collection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; padding: 0 2px 2px; background: #1a1612; }
+        .oc-card { position: relative; overflow: hidden; aspect-ratio: 3/4; cursor: pointer; }
+        .oc-card img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); filter: brightness(0.88); }
+        .oc-card:hover img { transform: scale(1.07); filter: brightness(0.7); }
+        .oc-card-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(20,15,10,0.97) 0%, rgba(20,15,10,0.5) 45%, transparent 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 28px 22px; transition: all 0.4s ease; }
+        .oc-card-tag { font-size: 0.68rem; letter-spacing: 3px; color: #bfa37e; text-transform: uppercase; margin-bottom: 7px; font-family: 'Cormorant Garamond', serif; font-style: italic; opacity: 0; transform: translateY(10px); transition: all 0.35s ease 0.05s; }
+        .oc-card-name { font-size: clamp(0.95rem, 1.5vw, 1.2rem); color: #f0ebe4; font-weight: 400; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; line-height: 1.3; transform: translateY(8px); transition: transform 0.35s ease 0.1s; font-family: 'Cormorant Garamond', serif; }
+        .oc-card-price { font-size: 1.05rem; color: #bfa37e; font-weight: 600; transform: translateY(8px); transition: transform 0.35s ease 0.15s; letter-spacing: 1px; }
+        .oc-card-btn { margin-top: 14px; background: transparent; border: 1px solid rgba(191,163,126,0.6); color: #bfa37e; padding: 9px 20px; font-size: 0.72rem; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; opacity: 0; transform: translateY(12px); transition: all 0.35s ease 0.2s; }
+        .oc-card-btn:hover { background: #bfa37e; color: #1a1612; }
+        .oc-card:hover .oc-card-tag, .oc-card:hover .oc-card-btn { opacity: 1; transform: translateY(0); }
+        .oc-card:hover .oc-card-name, .oc-card:hover .oc-card-price { transform: translateY(0); }
+        .oc-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; color: rgba(240,235,228,0.35); gap: 12px; width: 100%; }
+        .oc-empty p { font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; font-family: 'Cormorant Garamond', serif; }
+        .oc-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; gap: 16px; width: 100%; }
+        .oc-loading-spinner { width: 36px; height: 36px; border: 2px solid rgba(191,163,126,0.2); border-radius: 50%; border-top-color: #bfa37e; animation: spin 1s linear infinite; }
+        .oc-loading p { color: rgba(240,235,228,0.4); font-size: 0.8rem; letter-spacing: 3px; text-transform: uppercase; font-family: 'Cormorant Garamond', serif; }
+        .our-collection-footer { display: flex; justify-content: center; padding: 50px 10% 70px; background: #1a1612; }
+        .oc-view-all { background: transparent; border: 1px solid rgba(191,163,126,0.5); color: #bfa37e; padding: 15px 50px; font-size: 0.75rem; letter-spacing: 4px; text-transform: uppercase; cursor: pointer; transition: all 0.3s ease; }
+        .oc-view-all:hover { background: #bfa37e; color: #1a1612; border-color: #bfa37e; }
+
+        /* ─── CHATBOT ─── */
+        .chat-wrap { position: fixed; bottom: 30px; right: 30px; z-index: 9999; direction: ltr; }
+        .chat-box { position: fixed; bottom: 120px; right: 30px; width: 320px; height: 480px; background: white; border-radius: 24px; display: none; flex-direction: column; box-shadow: 0 15px 40px rgba(93, 78, 63, 0.3); overflow: hidden; animation: slideUp 0.4s ease; z-index: 9998; direction: ltr; }
+        .close-chat { cursor: pointer; font-size: 1.2rem; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: all 0.3s ease; color: white; background: #bfa37e !important; border: 2px solid white !important; box-shadow: 0 2px 10px rgba(191, 163, 126, 0.3); font-weight: bold; flex-shrink: 0; }
+        .close-chat:hover { background: #d4b794 !important; transform: scale(1.1); }
+        @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform: translateY(0); } }
+        .chat-header { background: #5d4e3f; color: white; padding: 20px; font-weight: bold; text-align: center; display: flex; justify-content: space-between; align-items: center; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem; letter-spacing: 2px; }
+        .chat-main { flex: 1; background: #f9f7f4; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; -webkit-overflow-scrolling: touch; }
+        .bot-msg { background: #f5f0e6; color: #5d4e3f; padding: 10px 14px; border-radius: 15px; font-size: 0.85rem; max-width: 85%; align-self: flex-start; animation: fadeIn 0.3s ease; }
+        .user-msg { background: #5d4e3f; color: white; padding: 10px 14px; border-radius: 15px; font-size: 0.85rem; max-width: 85%; align-self: flex-end; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .chat-input-container { padding: 15px; background: white; border-top: 1px solid #e0ddd6; display: flex; gap: 10px; }
+        .chat-input { flex: 1; padding: 12px 15px; border: 1px solid #bfa37e; border-radius: 25px; font-size: 0.9rem; outline: none; transition: all 0.3s ease; color: #5d4e3f; }
+        .chat-input:focus { border-color: #5d4e3f; box-shadow: 0 0 0 2px rgba(93, 78, 63, 0.2); }
+        .send-btn { background: #5d4e3f; color: white; border: none; width: 40px; height: 40px; border-radius: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; font-size: 1.2rem; font-weight: bold; touch-action: manipulation; }
+        .send-btn:hover { background: #4d4033; transform: scale(1.1); }
+        .robot-btn { background: none; border: none; cursor: pointer; animation: float 3s ease-in-out infinite; position: fixed; bottom: 30px; right: 30px; z-index: 9999; transition: opacity 0.3s ease; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+        /* ─── FOOTER ─── */
+        .aura-footer { background: #5d4e3f; padding: 60px 10% 20px; color: white; width: 100%; position: relative; z-index: 1; direction: ltr; }
+        .footer-grid { display: grid; grid-template-columns: 1fr 1fr 2fr; gap: 40px; margin-bottom: 40px; }
+        .footer-col h3 { font-size: 1rem; margin-bottom: 20px; text-transform: uppercase; font-weight: 400; letter-spacing: 1px; font-family: 'Cormorant Garamond', serif; }
+        .footer-links { display: flex; flex-direction: column; gap: 8px; }
+        .footer-link { font-size: 0.85rem; opacity: 0.9; cursor: pointer; transition: opacity 0.3s; position: relative; display: inline-block; padding-bottom: 3px; color: white; text-decoration: none; width: fit-content; }
+        .footer-link::after { content: ''; position: absolute; width: 0; height: 2px; bottom: 0; left: 0; background-color: #bfa37e; transition: width 0.3s ease; }
+        .footer-link:hover::after { width: 100%; }
+        .footer-bottom { border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .bottom-socials { display: flex; gap: 15px; align-items: center; }
+        .bottom-socials img { width: 32px; height: 32px; opacity: 0.8; cursor: pointer; transition: opacity 0.3s, transform 0.3s; filter: brightness(0) invert(1); }
+        .bottom-socials img:hover { opacity: 1; transform: translateY(-3px); }
+
+        /* ─── CHECKOUT PAGE ─── */
+        #checkoutPage { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; background: #fff; z-index: 3000; overflow: hidden; display: none; }
+        #notification-bar-checkout { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background-color: #5d4e3f; color: white; padding: 14px 40px; border-radius: 30px; z-index: 9999; transition: top 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); font-weight: 600; box-shadow: 0 4px 15px rgba(93, 78, 63, 0.3); text-align: center; min-width: 300px; max-width: 90%; }
+        #spinner-checkout { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #bfa37e; animation: spin 1s linear infinite; margin: 5px auto; }
+        .checkout-container { display: grid; grid-template-columns: 1.2fr 0.8fr; height: 100vh; width: 100%; }
+        .checkout-left { padding: 30px 8%; background: #fcfcfc; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
+        .checkout-right { padding: 30px 40px; background: #5d4e3f; color: white; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
+        .close-checkout { position: absolute; top: 15px; right: 20px; background: #bfa37e !important; border: 2px solid white !important; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; z-index: 3001; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: white; transition: all 0.3s ease; touch-action: manipulation; box-shadow: 0 2px 10px rgba(191, 163, 126, 0.5); }
+        .close-checkout:hover { background: #d4b794 !important; transform: scale(1.15) !important; }
+        .checkout-header { font-size: 1.5rem; font-family: 'Cormorant Garamond', serif; color: #5d4e3f; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid #e0ddd6; }
+        .checkout-form-group { margin-bottom: 12px; }
+        .checkout-form-group label { display: block; color: #8a7665; font-weight: 700; margin-bottom: 5px; font-size: 0.75rem; letter-spacing: 0.5px; }
+        .checkout-form-group input, .checkout-form-group select { width: 100%; padding: 10px; border: 1px solid #dccfc3; border-radius: 4px; font-size: 0.9rem; outline: none; color: #5d4e3f; background: white; transition: all 0.3s ease; font-family: 'Montserrat', sans-serif; }
+        .checkout-form-group input:focus, .checkout-form-group select:focus { border-color: #5d4e3f; box-shadow: 0 0 0 2px rgba(93, 78, 63, 0.1); }
+        .order-summary-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 0.95rem; }
+        .order-items-container { max-height: 200px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; }
+        .total-row { display: flex; justify-content: space-between; font-size: 1.5rem; font-weight: bold; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.3); font-family: 'Cormorant Garamond', serif; }
+        .place-order-btn { background: #bfa37e; color: white; border: none; padding: 15px; border-radius: 6px; font-weight: bold; font-size: 1rem; cursor: pointer; margin-top: 20px; transition: 0.3s; width: 100%; touch-action: manipulation; font-family: 'Montserrat', sans-serif; }
+        .place-order-btn:hover { background: #d4b794; transform: translateY(-3px); }
+        .place-order-btn.loading { position: relative; color: transparent; }
+        .place-order-btn.loading::after { content: ''; position: absolute; width: 20px; height: 20px; top: 50%; left: 50%; transform: translate(-50%, -50%); border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 1s linear infinite; }
+        .success-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 4000; padding: 20px; }
+        .success-modal { background: white; padding: 40px 30px; border-radius: 12px; text-align: center; max-width: 350px; animation: authReveal 0.3s ease; }
+        .success-modal h3 { color: #5d4e3f; margin: 15px 0 10px; font-size: 1.5rem; font-family: 'Cormorant Garamond', serif; }
+        .success-modal p { color: #5d4e3f; margin-bottom: 25px; font-size: 0.95rem; line-height: 1.5; }
+
+        /* ─── RTL ─── */
+        body.lang-rtl { direction: rtl; }
+        body.lang-rtl .nav-menu { flex-direction: row-reverse; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 1024px) {
+            .collection-section { grid-template-columns: repeat(3, 1fr); gap: 30px 15px; padding: 60px 8%; }
+            .our-collection-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .nav-menu { display: none; }
+            .hamburger-menu { display: flex; }
+            .brand-logo-img { height: 60px; }
+            .collection-section { grid-template-columns: repeat(2, 1fr); gap: 25px 12px; padding: 50px 5%; }
+            .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+            nav { padding: 20px 30px; }
+            .chat-box { width: 280px; height: 420px; right: 20px; bottom: 110px; }
+        }
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; }
+            .brand-logo-img { height: 50px; }
+            .hero { height: 70vh; min-height: 500px; }
+            .collection-section { padding: 40px 4%; gap: 20px 10px; grid-template-columns: repeat(2, 1fr); }
+            .side-panel { width: 100%; right: -100%; padding: 40px 20px; }
+            .our-collection-grid { grid-template-columns: repeat(2, 1fr); }
+            .our-collection-header { padding: 50px 5% 30px; }
+            .oc-category-header { padding: 35px 4% 18px; gap: 14px; }
+            .oc-card-tag, .oc-card-btn { opacity: 1; transform: translateY(0); }
+            .oc-card-name, .oc-card-price { transform: translateY(0); }
+            .chat-box { width: calc(100% - 40px); max-width: 320px; height: 420px; right: 20px; left: 20px; bottom: 110px; }
+            .robot-btn img { width: 70px; }
+            .product-modal-content { grid-template-columns: 1fr; max-width: 400px; }
+            .checkout-container { grid-template-columns: 1fr; height: auto; overflow-y: auto; }
+            .checkout-left, .checkout-right { padding: 20px; }
+            .footer-bottom { flex-direction: column; gap: 20px; text-align: center; }
+            .auth-modal { max-width: 100%; }
+            .auth-modal-body { padding: 22px 22px 28px; }
+            .auth-field-row { grid-template-columns: 1fr; gap: 0; }
+        }
+        @media (max-width: 480px) {
+            nav { padding: 12px 15px; }
+            .brand-logo-img { height: 45px; }
+            .collection-section { padding: 25px 3%; gap: 12px 6px; }
+            .robot-btn { bottom: 15px; right: 15px; }
+            .robot-btn img { width: 65px; }
+            .chat-box { width: calc(100% - 30px); max-width: 280px; height: 380px; right: 15px; left: 15px; bottom: 100px; }
+            .our-collection-grid { grid-template-columns: repeat(2, 1fr); gap: 1px; }
+            .oc-card-overlay { padding: 18px 14px; }
+            .oc-card-name { font-size: 0.85rem; letter-spacing: 1px; }
+            .oc-category-label { letter-spacing: 4px; font-size: 1rem; }
+        }
+    </style>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+</head>
+<body>
+
+<div id="notification-bar">
+    <span id="notify-text"></span>
+    <div id="spinner"></div>
+</div>
+
+<div id="viewport">
+
+    <!-- ═══ CART PANEL ═══ -->
+    <div id="cartPanel" class="side-panel">
+        <div class="panel-header">
+            <span>Cart</span>
+            <span class="close-panel" onclick="togglePanel('cartPanel')">✕</span>
+        </div>
+        <div class="cart-content" id="cartItems">
+            <div class="empty-cart">Your cart is empty.<br>Start adding some products!</div>
+        </div>
+        <div class="cart-footer">
+            <button class="checkout-btn" onclick="proceedToCheckout()">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <!-- ═══ PROFILE PANEL ═══ -->
+    <div id="profilePanel" class="side-panel">
+        <div class="panel-header">
+            <span>Profile</span>
+            <span class="close-panel" onclick="togglePanel('profilePanel')">✕</span>
+        </div>
+        <div id="profileStateOut" style="flex:1;display:flex;flex-direction:column;gap:14px;">
+            <div class="profile-avatar-large" style="width:70px;height:70px;font-size:22px;margin-bottom:6px;">👤</div>
+            <p style="font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#5d4e3f;line-height:1.6;margin-bottom:6px;">Welcome to AURA.<br>Sign in to access your account, track orders, and enjoy a personalised experience.</p>
+            <button class="profile-panel-btn primary" onclick="openAuthModal('login')">Sign In</button>
+            <button class="profile-panel-btn secondary" onclick="openAuthModal('signup')">Create Account</button>
+        </div>
+        <div id="profileStateIn" style="flex:1;display:none;flex-direction:column;">
+            <div class="profile-info-card">
+                <div class="profile-avatar-large" id="profileAvatar">👤</div>
+                <div class="profile-full-name" id="profileFullName">—</div>
+                <div class="profile-user-email" id="profileEmail">—</div>
+                <div class="profile-user-city" id="profileCity"></div>
+                <div class="profile-detail-row">
+                    <span class="profile-detail-label">Phone</span>
+                    <span class="profile-detail-value" id="profilePhone">—</span>
+                </div>
+                <div class="profile-detail-row">
+                    <span class="profile-detail-label">Member Since</span>
+                    <span class="profile-detail-value" id="profileJoined">—</span>
+                </div>
+            </div>
+            <div class="profile-signed-in-actions">
+                <button class="profile-panel-btn primary" onclick="openChangePwModal()">Change Password</button>
+                <button class="profile-panel-btn logout" onclick="logoutUser()">Log Out</button>
+                <button class="profile-panel-btn danger" onclick="openDeleteModal()">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ AUTH MODAL ═══ -->
+    <div id="authBackdrop" class="auth-backdrop" onclick="handleBackdropClick(event)">
+        <div class="auth-modal">
+            <div class="auth-modal-header">
+                <div class="auth-brand">AURA</div>
+                <div class="auth-tagline">Luxury Timepieces &amp; Accessories</div>
+                <button class="auth-close-btn" onclick="closeAuthModal()">✕</button>
+                <div class="auth-tabs">
+                    <button class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')">Sign In</button>
+                    <button class="auth-tab-btn" id="tabBtnSignup" onclick="switchAuthTab('signup')">Create Account</button>
+                </div>
+            </div>
+            <div class="auth-modal-body">
+                <div id="authPanelLogin" class="auth-form-panel active">
+                    <div id="loginError" class="auth-error-box"></div>
+                    <div id="loginSuccess" class="auth-success-box"></div>
+                    <div class="auth-field">
+                        <label class="auth-label">Email Address</label>
+                        <input id="loginEmail" class="auth-input" type="email" placeholder="your@email.com" autocomplete="email"/>
+                    </div>
+                    <div class="auth-field">
+                        <label class="auth-label">Password</label>
+                        <div class="auth-pw-wrap">
+                            <input id="loginPassword" class="auth-input" type="password" placeholder="••••••••" autocomplete="current-password"/>
+                            <button class="auth-pw-eye" type="button" onclick="togglePwEye('loginPassword',this)">👁</button>
+                        </div>
+                    </div>
+                    <button id="loginBtn" class="auth-submit" onclick="doLogin()">
+                        <span id="loginBtnText">Enter</span>
+                        <div id="loginSpinner" class="auth-mini-spinner"></div>
+                    </button>
+                    <div class="auth-footer-link"><a onclick="doForgotPassword()">Forgot password?</a></div>
+                </div>
+                <div id="authPanelSignup" class="auth-form-panel">
+                    <div id="signupError" class="auth-error-box"></div>
+                    <div id="signupSuccess" class="auth-success-box"></div>
+                    <div class="auth-section-label">Personal Details</div>
+                    <div class="auth-field-row">
+                        <div class="auth-field" style="margin-bottom:0"><label class="auth-label">First Name *</label><input id="suFirstName" class="auth-input" type="text" placeholder="Ali"/></div>
+                        <div class="auth-field" style="margin-bottom:0"><label class="auth-label">Last Name *</label><input id="suLastName" class="auth-input" type="text" placeholder="Hassan"/></div>
+                    </div>
+                    <div class="auth-field" style="margin-top:13px;">
+                        <label class="auth-label">Phone Number</label>
+                        <div class="phone-input-row">
+                            <input id="suPhoneCode" class="auth-input phone-code-input" type="text" placeholder="+964" value="+964"/>
+                            <input id="suPhoneNum" class="auth-input" type="tel" placeholder="750 123 4567"/>
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label class="auth-label">City / Location</label>
+                        <input id="suCity" class="auth-input" type="text" placeholder="Baghdad, Erbil, Duhok…"/>
+                    </div>
+                    <div class="auth-section-label">Account Details</div>
+                    <div class="auth-field">
+                        <label class="auth-label">Email Address *</label>
+                        <input id="suEmail" class="auth-input" type="email" placeholder="your@email.com" autocomplete="email"/>
+                    </div>
+                    <div class="auth-field">
+                        <label class="auth-label">Password * (min 6 characters)</label>
+                        <div class="auth-pw-wrap">
+                            <input id="suPassword" class="auth-input" type="password" placeholder="••••••••" autocomplete="new-password"/>
+                            <button class="auth-pw-eye" type="button" onclick="togglePwEye('suPassword',this)">👁</button>
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label class="auth-label">Confirm Password *</label>
+                        <div class="auth-pw-wrap">
+                            <input id="suConfirm" class="auth-input" type="password" placeholder="••••••••" autocomplete="new-password"/>
+                            <button class="auth-pw-eye" type="button" onclick="togglePwEye('suConfirm',this)">👁</button>
+                        </div>
+                    </div>
+                    <button id="signupBtn" class="auth-submit" onclick="doSignup()">
+                        <span id="signupBtnText">Create Account</span>
+                        <div id="signupSpinner" class="auth-mini-spinner"></div>
+                    </button>
+                    <div class="auth-footer-link">Already have an account? <a onclick="switchAuthTab('login')">Sign In</a></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ CHANGE PASSWORD MODAL ═══ -->
+    <div id="changePwModal" class="cpw-modal">
+        <div class="cpw-modal-content">
+            <h3>Change Password</h3>
+            <div id="cpwError" class="auth-error-box"></div>
+            <div id="cpwSuccess" class="auth-success-box"></div>
+            <div class="auth-field">
+                <label class="auth-label">New Password</label>
+                <div class="auth-pw-wrap">
+                    <input id="cpwNew" class="auth-input" type="password" placeholder="Min 6 characters"/>
+                    <button class="auth-pw-eye" type="button" onclick="togglePwEye('cpwNew',this)">👁</button>
+                </div>
+            </div>
+            <div class="auth-field">
+                <label class="auth-label">Confirm New Password</label>
+                <div class="auth-pw-wrap">
+                    <input id="cpwConfirm" class="auth-input" type="password" placeholder="Repeat password"/>
+                    <button class="auth-pw-eye" type="button" onclick="togglePwEye('cpwConfirm',this)">👁</button>
+                </div>
+            </div>
+            <div class="cpw-actions">
+                <button class="cpw-btn cancel" onclick="closeChangePwModal()">Cancel</button>
+                <button class="cpw-btn confirm" onclick="doChangePw()">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ DELETE ACCOUNT MODAL ═══ -->
+    <div id="deleteAccModal" class="del-modal">
+        <div class="del-modal-content">
+            <div style="font-size:2.8rem;margin-bottom:10px;">⚠️</div>
+            <h3>Delete Account</h3>
+            <p>This is permanent and cannot be undone. All your data will be erased from our records.</p>
+            <div class="del-modal-actions">
+                <button class="del-btn cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="del-btn confirm-del" onclick="doDeleteAccount()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ PRODUCT MODAL ═══ -->
+    <div id="productModal" class="product-modal">
+        <div class="product-modal-content" id="productModalContent"></div>
+    </div>
+
+    <!-- ═══ MOBILE NAV ═══ -->
+    <div id="mobileNavMenu" class="mobile-nav-menu">
+        <div class="mobile-nav-close" onclick="closeMobileNav()">✕</div>
+        <a href="home.html" onclick="closeMobileNav()">Home</a>
+        <a href="home.html#our-collection-wrapper" onclick="closeMobileNav()">Our Collection</a>
+        <a href="aboutUs.html" onclick="closeMobileNav()">About Us</a>
+        <a href="contact.html" onclick="closeMobileNav()">Contact</a>
+    </div>
+
+    <!-- ═══ NAVIGATION ═══ -->
+    <nav id="mainNav">
+        <div style="display: flex; align-items: center;">
+            <div class="hamburger-menu" onclick="toggleMobileNav()">
+                <span></span><span></span><span></span>
+            </div>
+            <img src="aura.png" class="brand-logo-img" onclick="goToHome()" alt="AURA Logo">
+        </div>
+        <div class="nav-menu">
+            <a href="home.html" class="active">Home</a>
+            <a href="home.html#our-collection-wrapper">Our Collection</a>
+            <a href="aboutUs.html">About Us</a>
+            <a href="contact.html">Contact</a>
+        </div>
+        <div class="nav-actions">
+            <div class="lang-dropdown" id="langDropdown">
+                <button class="lang-dropdown-btn" onclick="toggleLangDropdown(event)">
+                    <span id="selectedLangDisplay">EN</span>
+                    <span>▼</span>
+                </button>
+                <div class="lang-dropdown-content" id="langDropdownContent">
+                    <div class="lang-option active" onclick="setLanguage('en')">English</div>
+                    <div class="lang-option" onclick="setLanguage('ar')">العربية</div>
+                    <div class="lang-option" onclick="setLanguage('ku')">كوردى</div>
+                </div>
+            </div>
+            <button class="icon-btn" onclick="togglePanel('cartPanel')">
+                <img src="https://img.icons8.com/material-outlined/48/ffffff/shopping-cart.png" alt="Cart">
+            </button>
+            <button class="icon-btn" id="profileNavBtn" onclick="handleProfileClick()">
+                <img src="https://img.icons8.com/material-outlined/48/ffffff/user-male-circle.png" alt="Profile">
+                <span class="auth-dot"></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="hero">
+        <video class="hero-video" autoplay muted loop playsinline>
+            <source src="IMG_6427.MP4" type="video/mp4">
+        </video>
+        <div class="scroll-arrow" onclick="scrollToCollection()">
+            <img src="https://img.icons8.com/ios/50/ffffff/expand-arrow.png" alt="Scroll Down">
+        </div>
+    </section>
+
+    <!-- ═══ HOME FEATURED COLLECTION ═══ -->
+    <section class="collection-section" id="featured-section">
+        <div class="collection-loading">
+            <div class="collection-loading-spinner"></div>
+            <p>Loading Collection...</p>
+        </div>
+    </section>
+
+    <!-- ═══ OUR COLLECTION (CATEGORY-GROUPED) ═══ -->
+    <div class="our-collection-wrapper" id="our-collection-wrapper">
+        <div class="our-collection-header">
+            <div class="our-collection-eyebrow">Curated for You</div>
+            <div class="our-collection-title">Our <span>Collection</span></div>
+            <div class="our-collection-divider"></div>
+            <div class="our-collection-subtitle">Each piece is selected for its craftsmanship, rarity, and the story it tells.</div>
+        </div>
+
+        <!-- Collection content: will be filled with category sections -->
+        <div id="our-collection-content">
+            <div class="oc-loading">
+                <div class="oc-loading-spinner"></div>
+                <p>Loading...</p>
+            </div>
+        </div>
+
+        <div class="our-collection-footer" id="our-collection-footer" style="display:none;">
+            <button class="oc-view-all" onclick="scrollToTop()">Back to Top</button>
+        </div>
+    </div>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="aura-footer">
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h3>Main Menu</h3>
+                <div class="footer-links">
+                    <a href="home.html" class="footer-link">Home</a>
+                    <a href="ourCollection.html" class="footer-link">Our Collection</a>
+                    <a href="aboutUs.html" class="footer-link">About Us</a>
+                    <a href="contact.html" class="footer-link">Contact</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Collection</h3>
+                <div class="footer-links">
+                    <a href="ourCollection.html" class="footer-link">Men's Collection</a>
+                    <a href="ourCollection.html" class="footer-link">Women's Collection</a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>About Aura</h3>
+                <p style="line-height:1.6;text-align:justify;font-size:0.85rem;opacity:0.9;">At Aura, we believe a timepiece is more than just a tool — it is a reflection of your personality and a witness to your life's best moments. Our mission is to blend timeless elegance with modern precision.</p>
+                <p style="margin-top: 15px;"><a href="aboutUs.html" class="footer-link">Learn More About Us →</a></p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>Stay in touch</span>
+            <div class="bottom-socials">
+                <img src="https://img.icons8.com/ios/50/ffffff/instagram-new.png" alt="Instagram" onclick="openSocial('instagram')">
+                <img src="https://img.icons8.com/ios/50/ffffff/snapchat.png" alt="Snapchat" onclick="openSocial('snapchat')">
+                <img src="https://img.icons8.com/ios/50/ffffff/tiktok.png" alt="TikTok" onclick="openSocial('tiktok')">
+            </div>
+        </div>
+    </footer>
+
+    <!-- ═══ CHATBOT ═══ -->
+    <div class="chat-wrap">
+        <div class="chat-box" id="chatWindow">
+            <div class="chat-header">
+                <span>Aura Concierge</span>
+                <span class="close-chat" onclick="toggleChat()">✕</span>
+            </div>
+            <div class="chat-main" id="msgArea">
+                <div class="bot-msg">Welcome. How can I assist you with your AURA experience today?</div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." onkeypress="handleChatInput(event)">
+                <button class="send-btn" onclick="sendMessage()">↵</button>
+            </div>
+        </div>
+        <button class="robot-btn" onclick="toggleChat()">
+            <img src="chatbot1.png" width="100" alt="AI Assistant">
+        </button>
+    </div>
+</div>
+
+<!-- ═══ CHECKOUT PAGE ═══ -->
+<div id="checkoutPage">
+    <div id="notification-bar-checkout">
+        <span id="notify-text-checkout"></span>
+        <div id="spinner-checkout"></div>
+    </div>
+    <button class="close-checkout" onclick="closeCheckout()">✕</button>
+    <div class="checkout-container">
+        <div class="checkout-left">
+            <h2 class="checkout-header">Shipping &amp; Payment</h2>
+            <div class="checkout-form-group">
+                <label>Contact Information</label>
+                <input type="email" id="checkout-email" placeholder="Email Address" autocomplete="email">
+            </div>
+            <div class="checkout-form-group">
+                <label>Shipping Address</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px;">
+                    <input type="text" id="checkout-firstName" placeholder="First Name" autocomplete="given-name">
+                    <input type="text" id="checkout-lastName" placeholder="Last Name" autocomplete="family-name">
+                </div>
+                <input type="text" id="checkout-address" placeholder="Address" style="margin-bottom: 8px;" autocomplete="street-address">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <input type="text" id="checkout-city" placeholder="City" autocomplete="address-level2">
+                    <input type="text" id="checkout-region" placeholder="Region" autocomplete="address-level1">
+                </div>
+            </div>
+            <div class="checkout-form-group">
+                <label>Phone Number</label>
+                <input type="tel" id="checkout-phone" placeholder="+964 XXX XXX XXXX" autocomplete="tel">
+            </div>
+            <div class="checkout-form-group">
+                <label>Shipping Method</label>
+                <select id="shippingMethod" onchange="updateShippingCost()">
+                    <option value="0">Standard Shipping - FREE</option>
+                    <option value="5000">Express Shipping - 5,000 IQD</option>
+                    <option value="10000">Same-Day Delivery - 10,000 IQD</option>
+                </select>
+            </div>
+        </div>
+        <div class="checkout-right">
+            <h2 class="checkout-header" style="color: white; border-color: rgba(255,255,255,0.1);">Order Summary</h2>
+            <div class="order-items-container" id="checkout-order-items"></div>
+            <div class="order-summary-item"><div>Subtotal</div><div id="checkout-subtotal">0 IQD</div></div>
+            <div class="order-summary-item"><div>Shipping</div><div id="checkout-shipping-cost">FREE</div></div>
+            <div class="total-row"><div>Total</div><div id="checkout-total-price">0 IQD</div></div>
+            <button class="place-order-btn" onclick="placeOrder()" id="orderBtn">
+                Place Order — <span id="order-total">0</span> IQD
+            </button>
+        </div>
+    </div>
+    <div id="successOverlay" class="success-overlay">
+        <div class="success-modal">
+            <div style="font-size: 60px; color: #bfa37e;">✓</div>
+            <h3>Order Placed!</h3>
+            <p>Your order has been confirmed and will be processed shortly.</p>
+            <p style="font-size: 0.9rem; color: #5d4e3f; margin-top: 10px;">You will receive a confirmation within 24 hours.</p>
+            <button class="place-order-btn" style="width: 100%; margin-top: 20px;" onclick="continueShopping()">Continue Shopping</button>
+        </div>
+    </div>
+</div>
+
+<script>
+lucide.createIcons();
+
+/* ─── FIREBASE ─── */
+const firebaseConfig = {
+    apiKey: "AIzaSyDKUWNm1VCC_9NFv8nBScMMPGRB-Ff7Slc",
+    authDomain: "lura-45888.firebaseapp.com",
+    databaseURL: "https://lura-45888-default-rtdb.firebaseio.com",
+    projectId: "lura-45888",
+    storageBucket: "lura-45888.firebasestorage.app",
+    messagingSenderId: "396596170610",
+    appId: "1:396596170610:web:cee06f2a70bd61283a17eb"
+};
+firebase.initializeApp(firebaseConfig);
+const db   = firebase.database();
+const auth = firebase.auth();
+
+/* ─── GLOBALS ─── */
+let cart = [];
+let _authUser  = null;
+let _userData  = null;
+let productDatabase = {};
+const MAX_QUANTITY = 10;
+let productPrice = 0, shippingCost = 0, totalPrice = 0;
+let currentLang = localStorage.getItem('auraLang') || 'en';
+
+/* ─── NOTIFY ─── */
+function notify(text, showSpinner = false) {
+    const bar = document.getElementById('notification-bar');
+    document.getElementById('notify-text').innerText = text;
+    document.getElementById('spinner').style.display = showSpinner ? 'block' : 'none';
+    bar.style.top = "30px";
+    if (!showSpinner) setTimeout(() => bar.style.top = "-100px", 3000);
+}
+function notifyCheckout(text, showSpinner = false) {
+    const bar = document.getElementById('notification-bar-checkout');
+    document.getElementById('notify-text-checkout').innerText = text;
+    document.getElementById('spinner-checkout').style.display = showSpinner ? 'block' : 'none';
+    bar.style.top = "30px";
+    if (!showSpinner) setTimeout(() => bar.style.top = "-100px", 3000);
+}
+
+/* ─── LANGUAGE ─── */
+function toggleLangDropdown(e) {
+    e.stopPropagation();
+    document.getElementById('langDropdownContent').classList.toggle('show');
+}
+function setLanguage(lang) {
+    currentLang = lang;
+    localStorage.setItem('auraLang', lang);
+    const labels = { en: 'EN', ar: 'ع', ku: 'ك' };
+    document.getElementById('selectedLangDisplay').textContent = labels[lang] || 'EN';
+    document.querySelectorAll('.lang-option').forEach(opt =>
+        opt.classList.toggle('active', opt.getAttribute('onclick')?.includes("'"+lang+"'"))
+    );
+    document.getElementById('langDropdownContent').classList.remove('show');
+    const rtl = lang === 'ar' || lang === 'ku';
+    document.body.classList.toggle('lang-rtl', rtl);
+    document.documentElement.dir = rtl ? 'rtl' : 'ltr';
+}
+document.addEventListener('click', function(e) {
+    const dd = document.getElementById('langDropdown');
+    if (dd && !dd.contains(e.target))
+        document.getElementById('langDropdownContent').classList.remove('show');
+});
+
+/* ─── AUTH MODAL ─── */
+function openAuthModal(tab = 'login') {
+    document.getElementById('authBackdrop').classList.add('open');
+    switchAuthTab(tab);
+    closePanels();
+    closeMobileNav();
+}
+function closeAuthModal() {
+    document.getElementById('authBackdrop').classList.remove('open');
+    clearAuthMsgs();
+}
+function handleBackdropClick(e) {
+    if (e.target === document.getElementById('authBackdrop')) closeAuthModal();
+}
+function switchAuthTab(tab) {
+    const isLogin = tab === 'login';
+    document.getElementById('authPanelLogin').classList.toggle('active', isLogin);
+    document.getElementById('authPanelSignup').classList.toggle('active', !isLogin);
+    document.getElementById('tabBtnLogin').classList.toggle('active', isLogin);
+    document.getElementById('tabBtnSignup').classList.toggle('active', !isLogin);
+    clearAuthMsgs();
+}
+function clearAuthMsgs() {
+    ['loginError','loginSuccess','signupError','signupSuccess'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.style.display = 'none'; el.textContent = ''; }
+    });
+}
+function showAuthMsg(id, msg) {
+    const el = document.getElementById(id); if (!el) return;
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+}
+function togglePwEye(inputId, btn) {
+    const inp = document.getElementById(inputId);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.textContent = inp.type === 'text' ? '🙈' : '👁';
+}
+function setAuthLoading(btnId, textId, spinnerId, loading, label) {
+    const btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    document.getElementById(textId).style.display = loading ? 'none' : 'inline';
+    document.getElementById(spinnerId).style.display = loading ? 'inline-block' : 'none';
+    if (!loading && label) document.getElementById(textId).textContent = label;
+}
+
+/* ─── LOGIN ─── */
+async function doLogin() {
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    showAuthMsg('loginError', ''); showAuthMsg('loginSuccess', '');
+    if (!email || !password) { showAuthMsg('loginError', 'Please fill in all fields.'); return; }
+    setAuthLoading('loginBtn','loginBtnText','loginSpinner', true);
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+    } catch (err) {
+        const map = {
+            'auth/user-not-found':    'No account found with this email.',
+            'auth/wrong-password':    'Incorrect password.',
+            'auth/invalid-credential':'Invalid email or password.',
+            'auth/invalid-email':     'Please enter a valid email address.',
+            'auth/too-many-requests': 'Too many attempts. Please try again later.',
+            'auth/user-disabled':     'This account has been disabled.'
+        };
+        showAuthMsg('loginError', map[err.code] || err.message);
+        setAuthLoading('loginBtn','loginBtnText','loginSpinner', false, 'Enter');
+    }
+}
+
+/* ─── SIGN UP ─── */
+async function doSignup() {
+    const firstName = document.getElementById('suFirstName').value.trim();
+    const lastName  = document.getElementById('suLastName').value.trim();
+    const phoneCode = document.getElementById('suPhoneCode').value.trim();
+    const phoneNum  = document.getElementById('suPhoneNum').value.trim();
+    const city      = document.getElementById('suCity').value.trim();
+    const email     = document.getElementById('suEmail').value.trim();
+    const password  = document.getElementById('suPassword').value;
+    const confirm   = document.getElementById('suConfirm').value;
+    showAuthMsg('signupError', ''); showAuthMsg('signupSuccess', '');
+    if (!firstName || !lastName)  { showAuthMsg('signupError', 'Please enter your first and last name.'); return; }
+    if (!email)                   { showAuthMsg('signupError', 'Email address is required.'); return; }
+    if (password.length < 6)      { showAuthMsg('signupError', 'Password must be at least 6 characters.'); return; }
+    if (password !== confirm)     { showAuthMsg('signupError', 'Passwords do not match.'); return; }
+    setAuthLoading('signupBtn','signupBtnText','signupSpinner', true);
+    try {
+        const cred = await auth.createUserWithEmailAndPassword(email, password);
+        const uid  = cred.user.uid;
+        const phone = phoneNum ? `${phoneCode} ${phoneNum}` : '';
+        const profile = { uid, email, firstName, lastName, fullName: `${firstName} ${lastName}`, phone, city, role: 'customer', createdAt: Date.now(), lastLogin: Date.now() };
+        await db.ref(`users/${uid}`).set(profile);
+        showAuthMsg('signupSuccess', `Welcome, ${firstName}! Your account has been created.`);
+    } catch (err) {
+        const map = {
+            'auth/email-already-in-use': 'An account with this email already exists.',
+            'auth/invalid-email':        'Please enter a valid email address.',
+            'auth/weak-password':        'Password is too weak. Use at least 6 characters.'
+        };
+        showAuthMsg('signupError', map[err.code] || err.message);
+        setAuthLoading('signupBtn','signupBtnText','signupSpinner', false, 'Create Account');
+    }
+}
+
+/* ─── FORGOT PASSWORD ─── */
+async function doForgotPassword() {
+    const email = document.getElementById('loginEmail').value.trim();
+    showAuthMsg('loginError', ''); showAuthMsg('loginSuccess', '');
+    if (!email) { showAuthMsg('loginError', 'Enter your email address above first.'); return; }
+    try {
+        await auth.sendPasswordResetEmail(email);
+        showAuthMsg('loginSuccess', `Password reset email sent to ${email}`);
+    } catch (err) { showAuthMsg('loginError', err.message); }
+}
+
+/* ─── AUTH STATE ─── */
+auth.onAuthStateChanged(async function(user) {
+    _authUser = user;
+    if (user) {
+        const snap = await db.ref(`users/${user.uid}`).once('value');
+        _userData = snap.val() || { fullName: user.email, email: user.email, firstName: '', phone: '', city: '', createdAt: Date.now() };
+        db.ref(`users/${user.uid}`).update({ lastLogin: Date.now() });
+        renderProfileSignedIn(_userData);
+        closeAuthModal();
+        notify(`Welcome back, ${_userData.firstName || _userData.fullName}!`);
+        prefillCheckout(_userData);
+    } else {
+        _userData = null;
+        renderProfileSignedOut();
+    }
+});
+function renderProfileSignedIn(u) {
+    document.getElementById('profileStateOut').style.display = 'none';
+    document.getElementById('profileStateIn').style.display  = 'flex';
+    const name = u.fullName || u.email || 'User';
+    const initials = name.split(' ').filter(Boolean).map(w => w[0]).join('').toUpperCase().slice(0,2) || '👤';
+    document.getElementById('profileAvatar').textContent   = initials;
+    document.getElementById('profileFullName').textContent = name;
+    document.getElementById('profileEmail').textContent    = u.email || '';
+    document.getElementById('profileCity').textContent     = u.city ? `📍 ${u.city}` : '';
+    document.getElementById('profilePhone').textContent    = u.phone || '—';
+    document.getElementById('profileJoined').textContent  = u.createdAt ? new Date(u.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' }) : '—';
+    document.getElementById('profileNavBtn').classList.add('user-signed-in');
+    setAuthLoading('loginBtn','loginBtnText','loginSpinner', false, 'Enter');
+    setAuthLoading('signupBtn','signupBtnText','signupSpinner', false, 'Create Account');
+}
+function renderProfileSignedOut() {
+    document.getElementById('profileStateOut').style.display = 'flex';
+    document.getElementById('profileStateIn').style.display  = 'none';
+    document.getElementById('profileNavBtn').classList.remove('user-signed-in');
+}
+function prefillCheckout(u) {
+    const f = id => document.getElementById(id);
+    if (f('checkout-email'))     f('checkout-email').value     = u.email || '';
+    if (f('checkout-firstName')) f('checkout-firstName').value = u.firstName || '';
+    if (f('checkout-lastName'))  f('checkout-lastName').value  = u.lastName  || '';
+    if (f('checkout-phone'))     f('checkout-phone').value     = u.phone     || '';
+    if (f('checkout-city'))      f('checkout-city').value      = u.city      || '';
+}
+function handleProfileClick() {
+    if (_authUser) { togglePanel('profilePanel'); }
+    else { openAuthModal('login'); }
+}
+
+/* ─── LOGOUT ─── */
+async function logoutUser() {
+    try { await auth.signOut(); closePanels(); notify('Logged out successfully.'); }
+    catch (err) { notify('Error: ' + err.message); }
+}
+
+/* ─── CHANGE PASSWORD ─── */
+function openChangePwModal() {
+    document.getElementById('changePwModal').classList.add('open');
+    document.getElementById('cpwNew').value = '';
+    document.getElementById('cpwConfirm').value = '';
+    document.getElementById('cpwError').style.display   = 'none';
+    document.getElementById('cpwSuccess').style.display = 'none';
+}
+function closeChangePwModal() { document.getElementById('changePwModal').classList.remove('open'); }
+async function doChangePw() {
+    const nw   = document.getElementById('cpwNew').value;
+    const conf = document.getElementById('cpwConfirm').value;
+    const errEl = document.getElementById('cpwError');
+    const sucEl = document.getElementById('cpwSuccess');
+    errEl.style.display = 'none'; sucEl.style.display = 'none';
+    if (nw.length < 6) { errEl.textContent = 'Password must be at least 6 characters.'; errEl.style.display = 'block'; return; }
+    if (nw !== conf)   { errEl.textContent = 'Passwords do not match.'; errEl.style.display = 'block'; return; }
+    try {
+        await _authUser.updatePassword(nw);
+        sucEl.textContent = 'Password updated successfully!'; sucEl.style.display = 'block';
+        setTimeout(() => closeChangePwModal(), 1600);
+    } catch (err) {
+        errEl.textContent = err.code === 'auth/requires-recent-login'
+            ? 'Please sign out and sign in again before changing your password.' : err.message;
+        errEl.style.display = 'block';
+    }
+}
+
+/* ─── DELETE ACCOUNT ─── */
+function openDeleteModal()  { document.getElementById('deleteAccModal').classList.add('open'); }
+function closeDeleteModal() { document.getElementById('deleteAccModal').classList.remove('open'); }
+async function doDeleteAccount() {
+    if (!_authUser) return;
+    try {
+        await db.ref(`users/${_authUser.uid}`).remove();
+        await _authUser.delete();
+        closeDeleteModal(); closePanels();
+        notify('Account deleted.');
+    } catch (err) {
+        closeDeleteModal();
+        notify(err.code === 'auth/requires-recent-login'
+            ? 'Please sign out and sign in again before deleting your account.'
+            : 'Error: ' + err.message);
+    }
+}
+
+/* ─── HOME FEATURED PRODUCTS ─── */
+function initFirebaseProductListener() {
+    const section = document.getElementById('featured-section');
+    section.innerHTML = `<div class="collection-loading"><div class="collection-loading-spinner"></div><p>Loading Collection...</p></div>`;
+    db.ref('homeProducts').on('value', function(snapshot) {
+        const data = snapshot.val();
+        if (!data) { section.innerHTML = `<div class="collection-loading"><p style="opacity:0.6;">No products available at the moment.</p></div>`; return; }
+        renderProducts(data, section);
+    }, function() {
+        section.innerHTML = `<div class="collection-loading"><p style="opacity:0.6;color:#8b7355;">Failed to load products. Please refresh.</p></div>`;
+    });
+}
+function renderProducts(data, container) {
+    let products = Object.entries(data).map(([key, val]) => ({
+        id: val.id || key, name: val.name || 'Unnamed Product',
+        description: val.description || 'Luxury product from Aura collection.',
+        image: val.image || val.imageUrl || val.img || '',
+        price: Number(val.price) || 0, category: val.category || 'featured',
+        quantity: Number(val.quantity) || 0
+    })).filter(p => (p.quantity || 0) > 0 || p.quantity === undefined);
+    if (!products.length) { container.innerHTML = `<div class="collection-loading"><p style="opacity:0.6;">No products available.</p></div>`; return; }
+    products.forEach(p => { productDatabase[p.id] = p; });
+    container.innerHTML = products.map(p => `
+        <div class="product-card" onclick="openProductModal('${p.id}')">
+            <div class="product-img-wrap">
+                <img src="${p.image || 'https://via.placeholder.com/300x400?text=No+Image'}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
+                <div class="product-hover-overlay">
+                    <div class="overlay-name">${p.name}</div>
+                    <div class="overlay-price">${p.price.toLocaleString()} IQD</div>
+                    <div class="overlay-description">${p.description}</div>
+                    <div class="overlay-hint">Click for details</div>
+                </div>
+            </div>
+            <div class="product-info">
+                <div class="category-label">${p.category}</div>
+                <div class="product-name">${p.name}</div>
+                <div class="product-price">${p.price.toLocaleString()} IQD</div>
+            </div>
+        </div>`).join('');
+}
+
+/* ─── OUR COLLECTION — CATEGORY GROUPED ─── */
+function initCollectionListener() {
+    const content = document.getElementById('our-collection-content');
+    const footer  = document.getElementById('our-collection-footer');
+
+    db.ref('collectionProducts').on('value', function(snapshot) {
+        const data = snapshot.val();
+
+        if (!data) {
+            content.innerHTML = `<div class="oc-empty"><p>No collection items yet</p></div>`;
+            footer.style.display = 'none';
+            return;
+        }
+
+        let products = Object.entries(data).map(([key, val]) => ({
+            id: val.id || key,
+            name: val.name || 'Unnamed',
+            description: val.description || '',
+            image: val.image || '',
+            price: Number(val.price) || 0,
+            category: val.category || 'Other',
+            quantity: Number(val.quantity) || 0
+        })).filter(p => (p.quantity || 0) > 0 || p.quantity === undefined);
+
+        if (!products.length) {
+            content.innerHTML = `<div class="oc-empty"><p>No collection items yet</p></div>`;
+            footer.style.display = 'none';
+            return;
+        }
+
+        // Register all products in global productDatabase
+        products.forEach(p => {
+            productDatabase['col_' + p.id] = { ...p, id: 'col_' + p.id };
+        });
+
+        // Group products by category
+        const grouped = {};
+        products.forEach(p => {
+            const cat = (p.category || 'Other').trim();
+            if (!grouped[cat]) grouped[cat] = [];
+            grouped[cat].push(p);
+        });
+
+        // Build HTML: one section per category
+        let html = '';
+        Object.entries(grouped).forEach(([category, items]) => {
+            const count = items.length;
+            html += `
+            <div class="oc-category-section">
+                <div class="oc-category-header">
+                    <div class="oc-category-line"></div>
+                    <span class="oc-category-label">${category}</span>
+                    <span class="oc-category-count">${count} ${count === 1 ? 'piece' : 'pieces'}</span>
+                    <div class="oc-category-line"></div>
+                </div>
+                <div class="our-collection-grid">
+                    ${items.map(p => {
+                        const cid = 'col_' + p.id;
+                        return `<div class="oc-card" onclick="openProductModal('${cid}')">
+                            <img src="${p.image || 'https://via.placeholder.com/400x533?text=AURA'}"
+                                 alt="${p.name}"
+                                 onerror="this.src='https://via.placeholder.com/400x533?text=AURA'">
+                            <div class="oc-card-overlay">
+                                <div class="oc-card-tag">${p.category || 'Collection'}</div>
+                                <div class="oc-card-name">${p.name}</div>
+                                <div class="oc-card-price">${p.price.toLocaleString()} IQD</div>
+                                <button class="oc-card-btn" onclick="event.stopPropagation();openProductModal('${cid}')">View Details</button>
+                            </div>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>`;
+        });
+
+        content.innerHTML = html;
+        footer.style.display = 'flex';
+
+    }, function() {
+        content.innerHTML = `<div class="oc-empty"><p>Failed to load collection</p></div>`;
+    });
+}
+
+/* ─── PRODUCT MODAL ─── */
+function openProductModal(pid) {
+    const p = productDatabase[pid];
+    if (!p) { notify('Product details not found'); return; }
+    const img = p.image || 'https://via.placeholder.com/300x400?text=No+Image';
+    document.getElementById('productModalContent').innerHTML = `
+        <button class="product-modal-close" onclick="closeProductModal()">✕</button>
+        <img src="${img}" alt="${p.name}" class="product-modal-image" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
+        <div class="product-modal-details">
+            <div class="product-modal-name">${p.name}</div>
+            <div class="product-modal-price">${p.price.toLocaleString()} IQD</div>
+            <div class="product-modal-desc">${p.description}</div>
+            <div class="product-modal-quantity">
+                <label>Quantity</label>
+                <input type="number" id="modalQuantity" min="1" max="${MAX_QUANTITY}" value="1">
+            </div>
+            <div class="product-modal-actions">
+                <button class="add-to-cart-modal" onclick="addToCartFromModal('${p.id}')">Add to Cart</button>
+                <button class="buy-now-modal" onclick="buyNowFromModal('${p.id}')">Buy Now</button>
+            </div>
+        </div>`;
+    document.getElementById('productModal').style.display = 'flex';
+    closePanels(); closeMobileNav();
+}
+function closeProductModal() { document.getElementById('productModal').style.display = 'none'; }
+function addToCartFromModal(pid) {
+    const p = productDatabase[pid]; if (!p) return;
+    const qty = Math.min(parseInt(document.getElementById('modalQuantity').value)||1, MAX_QUANTITY);
+    const ex = cart.find(i => i.id === pid);
+    if (ex) { if (ex.quantity+qty > MAX_QUANTITY) { notify(`Max quantity is ${MAX_QUANTITY}`); return; } ex.quantity += qty; }
+    else cart.push({ id: p.id, name: p.name, price: p.price, image: p.image, quantity: qty });
+    updateCartDisplay(); notify(`"${p.name}" added to cart!`);
+    localStorage.setItem('auraCart', JSON.stringify(cart)); closeProductModal();
+}
+function buyNowFromModal(pid) {
+    const p = productDatabase[pid]; if (!p) return;
+    const qty = Math.min(parseInt(document.getElementById('modalQuantity').value)||1, MAX_QUANTITY);
+    cart = [{ id: p.id, name: p.name, price: p.price, image: p.image, quantity: qty }];
+    updateCartDisplay(); localStorage.setItem('auraCart', JSON.stringify(cart));
+    closeProductModal(); setTimeout(() => proceedToCheckout(), 300);
+}
+
+/* ─── CART ─── */
+function removeFromCart(pid) { cart = cart.filter(i => i.id !== pid); updateCartDisplay(); notify('Item removed from cart'); localStorage.setItem('auraCart', JSON.stringify(cart)); }
+function updateQuantity(pid, change) {
+    const item = cart.find(i => i.id === pid); if (!item) return;
+    item.quantity += change;
+    if (item.quantity > MAX_QUANTITY) { item.quantity = MAX_QUANTITY; notify(`Max quantity is ${MAX_QUANTITY}`); }
+    if (item.quantity < 1) { removeFromCart(pid); return; }
+    updateCartDisplay(); localStorage.setItem('auraCart', JSON.stringify(cart));
+}
+function updateCartDisplay() {
+    const c = document.getElementById('cartItems');
+    if (!cart.length) { c.innerHTML = `<div class="empty-cart">Your cart is empty.<br>Start adding some products!</div>`; return; }
+    c.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <img src="${item.image||'https://via.placeholder.com/70x70?text=IMG'}" alt="${item.name}" class="cart-item-image" onerror="this.src='https://via.placeholder.com/70x70?text=IMG'">
+            <div class="cart-item-details">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-price">${item.price.toLocaleString()} IQD</div>
+                <div class="cart-item-quantity">
+                    <button class="quantity-btn" onclick="updateQuantity('${item.id}',-1)">-</button>
+                    <span class="quantity-value">${item.quantity}</span>
+                    <button class="quantity-btn" onclick="updateQuantity('${item.id}',1)">+</button>
+                </div>
+            </div>
+            <button class="remove-item-btn" onclick="removeFromCart('${item.id}')">✕</button>
+        </div>`).join('');
+}
+
+/* ─── PANELS ─── */
+function togglePanel(id) {
+    const robot = document.querySelector('.robot-btn');
+    const panel = document.getElementById(id);
+    const opening = !panel.classList.contains('open');
+    document.querySelectorAll('.side-panel').forEach(p => { if (p.id !== id) p.classList.remove('open'); });
+    panel.classList.toggle('open');
+    if (robot) { robot.style.opacity = opening ? '0' : '1'; robot.style.pointerEvents = opening ? 'none' : 'auto'; }
+    closeMobileNav();
+}
+function closePanels() {
+    document.querySelectorAll('.side-panel.open').forEach(p => p.classList.remove('open'));
+    const robot = document.querySelector('.robot-btn');
+    if (robot) { robot.style.opacity = '1'; robot.style.pointerEvents = 'auto'; }
+}
+
+/* ─── MOBILE NAV ─── */
+function toggleMobileNav() {
+    const nav = document.getElementById('mobileNavMenu'), ham = document.querySelector('.hamburger-menu');
+    nav.classList.toggle('open'); ham.classList.toggle('active');
+    document.body.style.overflow = nav.classList.contains('open') ? 'hidden' : 'auto';
+}
+function closeMobileNav() {
+    const nav = document.getElementById('mobileNavMenu'), ham = document.querySelector('.hamburger-menu');
+    if (nav) nav.classList.remove('open'); if (ham) ham.classList.remove('active');
+    document.body.style.overflow = 'auto';
+}
+
+/* ─── CHATBOT ─── */
+let chatOpen = false;
+function toggleChat() {
+    const win = document.getElementById('chatWindow');
+    chatOpen = !chatOpen; win.style.display = chatOpen ? 'flex' : 'none'; closeMobileNav();
+}
+function sendMessage() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim(); if (!msg) return;
+    const area = document.getElementById('msgArea');
+    area.innerHTML += `<div class="user-msg">${msg}</div>`;
+    input.value = '';
+    setTimeout(() => {
+        const r = [
+            "Welcome to AURA! How can I enhance your shopping experience today?",
+            "I'm here to help you explore our collection, answer questions about shipping, or assist with any inquiries.",
+            "Would you like to know more about our products or shipping options?",
+            "For personalized assistance, feel free to ask me anything about AURA."
+        ];
+        area.innerHTML += `<div class="bot-msg">${r[Math.floor(Math.random()*r.length)]}</div>`;
+        area.scrollTop = area.scrollHeight;
+    }, 900);
+}
+function handleChatInput(e) { if (e.key === 'Enter') sendMessage(); }
+
+/* ─── SOCIAL / NAV ─── */
+function openSocial(p) {
+    const urls = { instagram: 'https://instagram.com/aura', snapchat: 'https://snapchat.com/add/aura', tiktok: 'https://tiktok.com/@aura' };
+    notify(`Opening ${p}...`); setTimeout(() => window.open(urls[p], '_blank'), 500);
+}
+function goToHome() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+function scrollToCollection() { document.querySelector('.collection-section')?.scrollIntoView({ behavior: 'smooth' }); }
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+/* ─── CHECKOUT ─── */
+function proceedToCheckout() { if (!cart.length) { notify('Your cart is empty'); return; } openCheckout(); }
+function openCheckout() {
+    document.getElementById('checkoutPage').style.display = 'block';
+    document.getElementById('mainNav').style.display = 'none';
+    document.querySelector('.robot-btn').style.display = 'none';
+    closePanels(); if (chatOpen) toggleChat(); closeMobileNav();
+    document.body.style.overflow = 'hidden';
+    if (_userData) prefillCheckout(_userData);
+    setupCartCheckout();
+}
+function setupCartCheckout() {
+    const c = document.getElementById('checkout-order-items');
+    c.innerHTML = '';
+    productPrice = cart.reduce((s, i) => s + i.price * i.quantity, 0);
+    cart.forEach(i => { c.innerHTML += `<div class="order-summary-item"><div>${i.name} × ${i.quantity}</div><div>${(i.price*i.quantity).toLocaleString()} IQD</div></div>`; });
+    shippingCost = 0; totalPrice = productPrice; updateCheckoutPrices();
+}
+function updateCheckoutPrices() {
+    document.getElementById('checkout-subtotal').textContent    = `${productPrice.toLocaleString()} IQD`;
+    document.getElementById('checkout-total-price').textContent = `${totalPrice.toLocaleString()} IQD`;
+    document.getElementById('order-total').textContent          = totalPrice.toLocaleString();
+    document.getElementById('checkout-shipping-cost').textContent = shippingCost === 0 ? 'FREE' : `${shippingCost.toLocaleString()} IQD`;
+}
+function updateShippingCost() {
+    shippingCost = parseInt(document.getElementById('shippingMethod').value) || 0;
+    totalPrice = productPrice + shippingCost; updateCheckoutPrices();
+}
+function closeCheckout() {
+    document.getElementById('checkoutPage').style.display = 'none';
+    document.getElementById('mainNav').style.display = 'flex';
+    document.querySelector('.robot-btn').style.display = 'block';
+    document.body.style.overflow = 'auto';
+}
+function placeOrder() {
+    const email     = document.getElementById('checkout-email').value.trim();
+    const firstName = document.getElementById('checkout-firstName').value.trim();
+    const lastName  = document.getElementById('checkout-lastName').value.trim();
+    const address   = document.getElementById('checkout-address').value.trim();
+    const city      = document.getElementById('checkout-city').value.trim();
+    const phone     = document.getElementById('checkout-phone').value.trim();
+    if (!email || !email.includes('@')) { notifyCheckout('Please enter a valid email'); return; }
+    if (!firstName) { notifyCheckout('Please enter your first name'); return; }
+    if (!lastName)  { notifyCheckout('Please enter your last name'); return; }
+    if (!address)   { notifyCheckout('Please enter your address'); return; }
+    if (!city)      { notifyCheckout('Please enter your city'); return; }
+    if (!phone)     { notifyCheckout('Please enter your phone number'); return; }
+    if (productPrice === 0) { notifyCheckout('Your order is empty'); return; }
+    const btn = document.getElementById('orderBtn');
+    btn.classList.add('loading'); btn.disabled = true;
+    const order = {
+        id: 'ORD-' + Date.now().toString().slice(-8),
+        customer: { name: `${firstName} ${lastName}`, email, phone, address: `${address}, ${city}, ${document.getElementById('checkout-region').value.trim()}` },
+        items: cart.map(i => ({ name: i.name, price: i.price, quantity: i.quantity })),
+        total: totalPrice, status: 'pending',
+        date: new Date().toISOString().split('T')[0],
+        shipping: document.getElementById('shippingMethod').options[document.getElementById('shippingMethod').selectedIndex].text,
+        paymentType: 'Card',
+        userId: _authUser ? _authUser.uid : 'guest'
+    };
+    let orders = []; try { orders = JSON.parse(localStorage.getItem('auraOrders')||'[]'); } catch(e) {}
+    orders.push(order); localStorage.setItem('auraOrders', JSON.stringify(orders));
+    db.ref('orders').push(order).catch(e => console.error('Order save error:', e));
+    notifyCheckout('Processing order...', true);
+    setTimeout(() => {
+        btn.classList.remove('loading'); btn.disabled = false;
+        document.getElementById('successOverlay').style.display = 'flex';
+        document.getElementById('notification-bar-checkout').style.top = "-100px";
+        cart = []; updateCartDisplay(); localStorage.setItem('auraCart', JSON.stringify(cart));
+    }, 2000);
+}
+function continueShopping() { document.getElementById('successOverlay').style.display = 'none'; closeCheckout(); setTimeout(() => notify('Thank you for your order!'), 500); }
+
+/* ─── SCROLL NAV ─── */
+window.onscroll = function() {
+    const nav = document.getElementById('mainNav');
+    const scrolled = window.pageYOffset > 50;
+    nav.classList.toggle('scrolled-nav', scrolled);
+    nav.classList.toggle('light-nav', scrolled);
+    document.querySelectorAll('.nav-menu a').forEach(l => {
+        l.style.color = scrolled ? '#5d4e3f' : 'white';
+        l.style.textShadow = scrolled ? 'none' : '0 1px 3px rgba(0,0,0,0.7)';
+    });
+    document.querySelectorAll('.icon-btn img').forEach(i => {
+        i.style.filter = scrolled
+            ? 'brightness(0) saturate(100%) invert(23%) sepia(8%) saturate(1732%) hue-rotate(349deg) brightness(92%) contrast(86%)'
+            : 'brightness(0) invert(1)';
+    });
+    document.querySelectorAll('.hamburger-menu span').forEach(s => {
+        s.style.backgroundColor = scrolled ? '#5d4e3f' : 'white';
+    });
+};
+
+/* ─── KEYBOARD ─── */
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeAuthModal(); closeProductModal();
+        closeChangePwModal(); closeDeleteModal(); closeCheckout(); closeMobileNav();
+        closePanels();
+    }
+});
+document.addEventListener('click', function(e) {
+    const mobileNav = document.getElementById('mobileNavMenu');
+    const hamburger = document.querySelector('.hamburger-menu');
+    if (mobileNav && mobileNav.classList.contains('open') && !mobileNav.contains(e.target) && !hamburger.contains(e.target)) closeMobileNav();
+});
+
+/* ─── INIT ─── */
+document.addEventListener('DOMContentLoaded', function() {
+    lucide.createIcons();
+    try { const c = localStorage.getItem('auraCart'); if (c) { cart = JSON.parse(c); updateCartDisplay(); } } catch(e) {}
+    setLanguage(currentLang);
+    initFirebaseProductListener();
+    initCollectionListener();
+});
+window.addEventListener('beforeunload', function() {
+    localStorage.setItem('auraCart', JSON.stringify(cart));
+});
+</script>
+</body>
+</html>
