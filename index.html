@@ -93,8 +93,10 @@ button { font-family: inherit; }
 .sidebar-footer { margin-top: auto; padding: 14px 20px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
 .logout-btn { width: 100%; background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.25); color: #EF9A9A; padding: 8px 12px; border-radius: 6px; font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 1px; cursor: pointer; transition: all 0.2s; }
 .logout-btn:hover { background: rgba(239,68,68,.25); }
-.mobile-header { display: none; background: var(--navy); border-bottom: 1px solid rgba(255,255,255,.1); padding: 0 16px; height: var(--header-h); align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 150; }
-.mobile-logo { font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 900; letter-spacing: 5px; color: #fff; }
+
+/* ── MOBILE HEADER: hamburger only, no logo ── */
+.mobile-header { display: none; background: var(--navy); border-bottom: 1px solid rgba(255,255,255,.1); padding: 0 12px; height: var(--header-h); align-items: center; justify-content: flex-end; position: sticky; top: 0; z-index: 150; }
+.mobile-logo { display: none !important; }
 .menu-btn { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.7); width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; flex-shrink: 0; }
 .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(13,43,85,0.7); z-index: 190; }
 #mainContent { flex: 1; min-width: 0; overflow-y: auto; display: flex; flex-direction: column; background: var(--bg); }
@@ -243,11 +245,13 @@ select#p-page { border-color: rgba(21,101,192,.4); }
 @media (max-width: 1200px) { :root { --sidebar-w: 200px; } .stat-grid { grid-template-columns: repeat(2,1fr); } .grid-3 { grid-template-columns: repeat(2,1fr); } }
 @media (max-width: 1024px) { .grid-2 { grid-template-columns: 1fr; } }
 @media (max-width: 768px) {
-  :root { --page-pad: 16px; }
+  :root { --page-pad: 16px; --header-h: 42px; }
   #sidebar { position: fixed; left: 0; top: 0; height: 100%; transform: translateX(-100%); z-index: 200; }
   #sidebar.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(13,43,85,.4); }
   .sidebar-backdrop.open { display: block; }
-  .mobile-header { display: flex; }
+  /* ── KEY CHANGE: show mobile-header but hide the logo text ── */
+  .mobile-header { display: flex; height: 42px; padding: 0 12px; justify-content: flex-end; }
+  .mobile-logo { display: none !important; }
   .page { padding: 14px; }
   .page-header { padding: 14px 14px 0; }
   .stat-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
@@ -327,8 +331,8 @@ select#p-page { border-color: rgba(21,101,192,.4); }
 
 <!-- APP SHELL -->
 <div id="appShell" style="display:none;">
+  <!-- MOBILE HEADER: hamburger only, no logo -->
   <div class="mobile-header">
-    <div class="mobile-logo">AURA</div>
     <div class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
   </div>
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
@@ -520,9 +524,7 @@ select#p-page { border-color: rgba(21,101,192,.4); }
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════
-         MESSAGES PAGE — READS FROM FIREBASE /messages
-         ═══════════════════════════════════════════════════ -->
+    <!-- MESSAGES -->
     <div id="p-messages" class="page">
       <div class="page-header"><div class="page-header-inner">
         <div><div class="page-title">MESSAGES</div><div class="page-sub">LIVE FROM FIREBASE · CONTACT FORM SUBMISSIONS</div></div>
@@ -531,7 +533,6 @@ select#p-page { border-color: rgba(21,101,192,.4); }
         </div>
       </div></div>
       <div style="padding:var(--page-pad);">
-        <!-- Stats row -->
         <div class="stat-grid" style="margin-bottom:20px;">
           <div class="stat-card"><div class="stat-label">Total Messages</div><div class="stat-value" id="msg-total" style="color:var(--accent)">0</div></div>
           <div class="stat-card"><div class="stat-label">Unread</div><div class="stat-value" id="msg-unread" style="color:var(--warning)">0</div></div>
@@ -1020,15 +1021,11 @@ window.markDelivered = function(id){
   if(idx!==-1){ orders[idx].status='completed'; saveOrders(orders); renderOrders(); toast(`Order #${id} marked delivered`,'success'); }
 };
 
-/* ═══════════════════════════════════════════════════════════
-   MESSAGES — FULLY FIREBASE-POWERED
-   Reads from /messages, writes read/reply back to Firebase
-   ═══════════════════════════════════════════════════════════ */
-let _messages = {};       // Firebase messages cache
+/* ── MESSAGES ── */
+let _messages = {};
 let _msgFilter = 'unread';
 let _currentReplyKey = null;
 
-/* Listen to Firebase /messages in real time */
 onValue(ref(db, 'messages'), function(snap) {
     _messages = snap.val() || {};
     if (currentPage === 'messages') renderMessages();
@@ -1058,36 +1055,22 @@ function renderMessages() {
     const entries = Object.entries(_messages);
     const now = new Date();
     const todayStr = now.toISOString().split('T')[0];
-
-    /* Update stats */
     const total   = entries.length;
     const unread  = entries.filter(([k,m]) => !m.read).length;
     const replied = entries.filter(([k,m]) => m.replied).length;
     const today   = entries.filter(([k,m]) => m.date && m.date.startsWith(todayStr)).length;
-
     document.getElementById('msg-total').textContent   = total;
     document.getElementById('msg-unread').textContent  = unread;
     document.getElementById('msg-replied').textContent = replied;
     document.getElementById('msg-today').textContent   = today;
-
-    /* Filter */
     let filtered = entries;
     if (_msgFilter === 'unread')  filtered = entries.filter(([k,m]) => !m.read);
     if (_msgFilter === 'replied') filtered = entries.filter(([k,m]) => m.replied);
-
-    /* Sort: newest first */
     filtered.sort(([,a],[,b]) => new Date(b.date) - new Date(a.date));
-
     const cont = document.getElementById('messagesContainer');
     const none = document.getElementById('noMessages');
-
-    if (!filtered.length) {
-        cont.innerHTML = '';
-        none.classList.remove('hidden');
-        return;
-    }
+    if (!filtered.length) { cont.innerHTML = ''; none.classList.remove('hidden'); return; }
     none.classList.add('hidden');
-
     cont.innerHTML = filtered.map(([key, m]) => {
         const dateStr = m.date ? new Date(m.date).toLocaleString() : '—';
         const isUnread = !m.read;
@@ -1114,22 +1097,17 @@ function renderMessages() {
     }).join('');
 }
 
-/* Mark a message as read in Firebase */
 window.markMsgRead = function(key) {
     db.ref('messages/' + key).update({ read: true })
         .then(() => toast('Marked as read', 'info'))
         .catch(err => toast('Error: ' + err.message, 'error'));
 };
-
-/* Delete a message from Firebase */
 window.deleteMsg = function(key) {
     if (!confirm('Delete this message permanently?')) return;
     db.ref('messages/' + key).remove()
         .then(() => toast('Message deleted', 'success'))
         .catch(err => toast('Error: ' + err.message, 'error'));
 };
-
-/* Open reply modal */
 window.openReply = function(key) {
     const m = _messages[key]; if (!m) return;
     _currentReplyKey = key;
@@ -1138,22 +1116,13 @@ window.openReply = function(key) {
     document.getElementById('replyText').value = '';
     document.getElementById('replyModal').classList.add('open');
 };
-
-/* Send reply — saves back to Firebase */
 window.sendReply = function() {
     const txt = document.getElementById('replyText').value.trim();
     if (!txt) { toast('Enter a reply', 'error'); return; }
-
     db.ref('messages/' + _currentReplyKey).update({
-        read:      true,
-        replied:   true,
-        replyText: txt,
-        replyDate: new Date().toISOString()
+        read: true, replied: true, replyText: txt, replyDate: new Date().toISOString()
     })
-    .then(() => {
-        toast('Reply saved!', 'success');
-        document.getElementById('replyModal').classList.remove('open');
-    })
+    .then(() => { toast('Reply saved!', 'success'); document.getElementById('replyModal').classList.remove('open'); })
     .catch(err => toast('Error: ' + err.message, 'error'));
 };
 
