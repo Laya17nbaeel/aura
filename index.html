@@ -339,13 +339,12 @@ select option { background: #fff; color: var(--text); }
 
 <div id="appShell">
   <div class="mobile-header">
-    <div class="mobile-logo">AURA</div>
     <div class="menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></div>
   </div>
   <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
   <aside id="sidebar">
-    <div class="sidebar-logo"><div><span class="logo-sub">ADMIN PANEL</span></div></div>
+    <div class="sidebar-logo"><div><div class="logo-mark">AURA</div><span class="logo-sub">ADMIN PANEL</span></div></div>
     <div class="conn-dot"><div class="dot" id="connDot"></div><span id="connText">CONNECTING</span></div>
     <div class="nav-section-label">ANALYTICS</div>
     <button class="nav-btn active" onclick="showPage('dashboard',this)" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
