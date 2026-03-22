@@ -46,9 +46,9 @@ button { font-family: inherit; }
 .nav-btn.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent-sky); border-radius: 0 2px 2px 0; }
 .nav-btn.active i { color: var(--accent-sky); }
 .sidebar-footer { margin-top: auto; padding: 14px 20px; border-top: 1px solid rgba(255,255,255,.08); flex-shrink: 0; }
-.mobile-header { display: none; background: var(--navy); border-bottom: 1px solid rgba(255,255,255,.1); padding: 0 16px; height: var(--header-h); align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 150; }
+.mobile-header { display: none; border-bottom: 1px solid rgba(255,255,255,.1); padding: 0 16px; height: var(--header-h); align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 150; }
 .mobile-logo { font-size: 20px; font-weight: 900; letter-spacing: 5px; color: #fff; }
-.menu-btn { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); color: rgba(255,255,255,.7); width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; flex-shrink: 0; }
+.menu-btn { background: rgba(38, 15, 168, 0.06); border: 1px solid rgba(232, 223, 223, 0.15); color: rgb(13, 43, 85); width: 36px; height: 36px; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; flex-shrink: 0; }
 .sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(13,43,85,0.7); z-index: 190; }
 #mainContent { flex: 1; min-width: 0; overflow-y: auto; display: flex; flex-direction: column; background: var(--bg); }
 .page-header { padding: var(--page-pad) var(--page-pad) 0; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
@@ -315,7 +315,7 @@ select option { background: #fff; color: var(--text); }
   #sidebar { position: fixed; left: 0; top: 0; height: 100%; transform: translateX(-100%); z-index: 200; }
   #sidebar.open { transform: translateX(0); box-shadow: 8px 0 32px rgba(13,43,85,.4); }
   .sidebar-backdrop.open { display: block; }
-  .mobile-header { display: flex; }
+  .mobile-header { display:flex; }
   .page { padding: 14px; }
   .page-header { padding: 14px 14px 0; }
   .stat-grid { grid-template-columns: repeat(2,1fr); gap: 10px; }
@@ -348,7 +348,7 @@ select option { background: #fff; color: var(--text); }
     <div class="conn-dot"><div class="dot" id="connDot"></div><span id="connText">CONNECTING</span></div>
     <div class="nav-section-label">ANALYTICS</div>
     <button class="nav-btn active" onclick="showPage('dashboard',this)" data-page="dashboard"><i class="fas fa-chart-line"></i> Dashboard</button>
-    <button class="nav-btn" onclick="showPage('finances',this)" data-page="finances"><i class="fas fa-chart-pie"></i> Finances</button>
+    <button class="nav-btn" onclick="showPage('finances',this)" data-page="finances"><i class="fas fa-chart-pie"></i> Finances & AI </button>
     <div class="nav-section-label">STORE</div>
     <button class="nav-btn" onclick="showPage('products',this)" data-page="products"><i class="fas fa-box"></i> Products</button>
     <button class="nav-btn" onclick="showPage('inventory',this)" data-page="inventory"><i class="fas fa-boxes"></i> Inventory <span class="badge hidden" id="lowStockBadge">0</span></button>
@@ -418,7 +418,7 @@ select option { background: #fff; color: var(--text); }
 
     <!-- FINANCES -->
     <div id="p-finances" class="page">
-      <div class="page-header"><div class="page-header-inner"><div><div class="page-title">FINANCIAL ANALYTICS</div><div class="page-sub">YEARLY PROFIT / LOSS + AI RECOMMENDATIONS</div></div></div></div>
+      <div class="page-header"><div class="page-header-inner"><div><div class="page-title">FINANCIAL ANALYTICS </div><div class="page-sub">YEARLY PROFIT / LOSS + AI RECOMMENDATIONS</div></div></div></div>
       <div style="padding:var(--page-pad);">
 
         <!-- Charts Row -->
